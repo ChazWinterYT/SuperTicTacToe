@@ -16,9 +16,8 @@ body {
     grid-template-rows: repeat(3, 1fr);
     gap: 0px;
     margin: 0 auto;
-    max-width: 500px;
     height: 90vw;
-    max-height: 500px;
+    max-height: 700px;
   }
   
   .square {
