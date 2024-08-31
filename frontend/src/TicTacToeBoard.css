@@ -2,10 +2,13 @@
 
 .board {
     display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 0px;
     margin: 0 auto;
+    max-width: 500px;
+    height: 90vw;
+    max-height: 500px;
   }
   
   .square {
@@ -21,6 +24,6 @@
   }
   
   .square:hover {
-    background-color: #f0f0f0;
+    background-color: #ca79d1;
   }
   
