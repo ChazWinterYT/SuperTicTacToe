@@ -38,5 +38,5 @@ jobs:
       run: aws s3 sync frontend/build/ s3://chazwinter.com/SuperTicTacToe/frontend --delete
       
     - name: Sync the rest of the S3 bucket
-      run: aws s3 sync ./ s3://chazwinter.com/SuperTicTacToe --delete --exclude ".git/*" --exclude ".github/*" --exclude "README.md" --exclude "build.js""
+      run: aws s3 sync ./ s3://chazwinter.com/SuperTicTacToe --delete --exclude ".git/*" --exclude ".github/*" --exclude "README.md" --exclude "build.js" --exclude "frontend/build/*"
       
