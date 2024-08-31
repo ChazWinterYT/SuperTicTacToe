@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import TicTacToeBoard3x3 from './TicTacToeBoard3x3';
 
