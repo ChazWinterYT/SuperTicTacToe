@@ -34,5 +34,9 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Sync S3 bucket
-      run: aws s3 sync ./ s3://chazwinter.com/SuperTicTacToe --delete --exclude ".git/*" --exclude ".github/*" --exclude "README.md" --exclude "build.js"
+    - name: Sync frontend/build to S3
+      run: aws s3 sync frontend/build/ s3://chazwinter.com/SuperTicTacToe/frontend --delete
+      
+    - name: Sync the rest of the S3 bucket
+      run: aws s3 sync ./ s3://chazwinter.com/SuperTicTacToe --delete --exclude ".git/*" --exclude ".github/*" --exclude "README.md" --exclude "build.js""
+      
