@@ -19,7 +19,10 @@ jobs:
         node-version: '12' # or the version you're using
 
     - name: Install dependencies
-      run: npm install
+      run: cd frontend && npm install
+
+    - name: Build the React app
+      run: cd frontend && npm run build
 
     - name: Run build script
       run: node build.js
