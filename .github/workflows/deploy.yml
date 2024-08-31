@@ -32,4 +32,4 @@ jobs:
         aws-region: us-east-1
 
     - name: Sync S3 bucket
-      run: aws s3 sync ./ s3://chazwinter.com/TicTacToe --delete --exclude ".git/*" --exclude ".github/*" --exclude "README.md" --exclude "build.js"
+      run: aws s3 sync ./ s3://chazwinter.com/SuperTicTacToe --delete --exclude ".git/*" --exclude ".github/*" --exclude "README.md" --exclude "build.js"
