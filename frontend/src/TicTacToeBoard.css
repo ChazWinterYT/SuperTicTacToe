@@ -1,5 +1,15 @@
 /* src/TicTacToeBoard.css */
 
+body {
+    background-color: #120729; 
+    margin: 0; 
+    padding: 0; 
+    height: 100vh; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
 .board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -14,9 +24,10 @@
   .square {
     width: 100px;
     height: 100px;
-    background-color: #46326d;
+    background-color: #4b3377;
     border: 2px solid #000;
-    font-size: 4em;
+    font-size: 5em;
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,6 +35,6 @@
   }
   
   .square:hover {
-    background-color: #ca79d1;
+    background-color: #9e71a3;
   }
   
