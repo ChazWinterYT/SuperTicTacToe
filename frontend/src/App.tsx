@@ -1,16 +1,17 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import TicTacToeBoard3x3 from './TicTacToeBoard3x3';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Super Tic Tac Toe, coming soon!
+          Super Tic Tac Toe!
         </p>
       </header>
+      <TicTacToeBoard3x3 />
     </div>
   );
 }
