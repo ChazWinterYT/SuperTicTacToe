@@ -4,10 +4,10 @@ body {
     background-color: #120729; 
     margin: 0; 
     padding: 0; 
-    height: 100vh; 
+    height: 80vh; 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: top;
   }
 
 .board {
@@ -16,8 +16,6 @@ body {
     grid-template-rows: repeat(3, 1fr);
     gap: 0px;
     margin: 0 auto;
-    height: 90vw;
-    max-height: 700px;
   }
   
   .square {

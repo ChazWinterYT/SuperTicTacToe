@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import TicTacToeBoard3x3 from './TicTacToeBoard3x3';
+import Version from './Version';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         </p>
       </header>
       <TicTacToeBoard3x3 />
+      <Version />
     </div>
   );
 }
