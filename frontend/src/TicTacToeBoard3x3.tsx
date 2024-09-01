@@ -38,8 +38,18 @@ const TicTacToeBoard3x3: React.FC = () => {
     };
 
     const winner = checkIfWinner(board);
-    let currentStatus = winner ? `${winner} Wins!` 
-                        : `${isXNext ? 'X' : 'O'}'s turn`;
+    const isBoardFull = (board: string[]) => {
+        return board.every(square => square !== null);
+    };
+    
+    let currentStatus;
+    if (winner) {
+        currentStatus = `${winner} Wins!`;
+    } else if (isBoardFull(board)) {
+        currentStatus = "It's a Draw :/";
+    } else {
+        currentStatus = `${isXNext ? 'X' : 'O'}'s turn`
+    }
 
     return (
         <div>
