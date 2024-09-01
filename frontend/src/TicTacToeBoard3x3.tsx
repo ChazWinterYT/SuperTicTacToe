@@ -22,22 +22,44 @@ const TicTacToeBoard3x3: React.FC = () => {
         </button>
     );
 
+    const checkIfWinner = (board: string[]) => {
+        const lines = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],    // Horizontal
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],    // Vertical
+            [0, 4, 8], [2, 4, 6],               // Diagonal
+        ];
+        for (let i = 0; i < lines.length; i++) {
+            const [a, b, c] = lines[i];
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                return board[a];
+            }
+        }
+        return null;
+    };
+
+    const winner = checkIfWinner(board);
+    let currentStatus = winner ? `${winner} Wins!` 
+                        : `${isXNext ? 'X' : 'O'}'s turn`;
+
     return (
-        <div className="board">
-            <div className="board-row">
-                {renderSquare(0)}
-                {renderSquare(1)}
-                {renderSquare(2)}
-            </div>
-            <div className="board-row">
-                {renderSquare(3)}
-                {renderSquare(4)}
-                {renderSquare(5)}
-            </div>
-            <div className="board-row">
-                {renderSquare(6)}
-                {renderSquare(7)}
-                {renderSquare(8)}
+        <div>
+            <div className='status'>{currentStatus}</div>
+            <div className="board">
+                <div className="board-row">
+                    {renderSquare(0)}
+                    {renderSquare(1)}
+                    {renderSquare(2)}
+                </div>
+                <div className="board-row">
+                    {renderSquare(3)}
+                    {renderSquare(4)}
+                    {renderSquare(5)}
+                </div>
+                <div className="board-row">
+                    {renderSquare(6)}
+                    {renderSquare(7)}
+                    {renderSquare(8)}
+                </div>
             </div>
         </div>
     );

@@ -34,4 +34,11 @@ body {
   .square:hover {
     background-color: #9e71a3;
   }
+
+  .status {
+    margin-bottom: 10px;
+    font-size: 2em;
+    color: #ffffff;
+    text-align: center;
+  }
   
