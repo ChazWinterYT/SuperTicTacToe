@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TicTacToeBoard.css';
 
 const TicTacToeBoard3x3: React.FC = () => {
     const [board, setBoard] = useState(Array(9).fill(null));
     const [isXNext, setIsXNext] = useState(true);
+    const [winningLine, setWinningLine] = useState<number[] | null>(null);
+    const [winner, setWinner] = useState<string | null>(null);
 
     const handleClick = (index: number) => {
-        const newBoard = board.slice();
-        if (newBoard[index] || winner) {
-            // Block moves if the square is already occupied or there is a winner already
+        if (board[index] || winner) {
             return;
         }
+
+        const newBoard = board.slice();
         newBoard[index] = isXNext ? 'X' : 'O';
         setBoard(newBoard);
         setIsXNext(!isXNext);
     };
 
     const renderSquare = (index: number) => (
-        <button className="square" onClick={() => handleClick(index)}>
+        <button
+            className={`square ${winningLine && winningLine.includes(index) ? 'winning-square' : ''}`}
+            onClick={() => handleClick(index)}
+        >
             {board[index]}
         </button>
     );
@@ -31,45 +36,49 @@ const TicTacToeBoard3x3: React.FC = () => {
         for (let i = 0; i < lines.length; i++) {
             const [a, b, c] = lines[i];
             if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                return board[a];
+                return { winner: board[a], line: lines[i] };
             }
         }
         return null;
     };
 
-    const winner = checkIfWinner(board);
+    useEffect(() => {
+        const result = checkIfWinner(board);
+        if (result) {
+            setWinner(result.winner);
+            setWinningLine(result.line);
+        }
+    }, [board]);
+
     const isBoardFull = (board: string[]) => {
         return board.every(square => square !== null);
     };
-    
-    let currentStatus;
-    if (winner) {
-        currentStatus = `${winner} Wins!`;
-    } else if (isBoardFull(board)) {
-        currentStatus = "It's a Draw :/";
-    } else {
-        currentStatus = `${isXNext ? 'X' : 'O'}'s turn`
-    }
+
+    const resetGame = () => {
+        setBoard(Array(9).fill(null));
+        setIsXNext(true);
+        setWinningLine(null);
+        setWinner(null);
+    };
+
+    const currentStatus = winner
+        ? `${winner} Wins!`
+        : isBoardFull(board)
+            ? "It's a Draw!"
+            : `${isXNext ? 'X' : 'O'}'s turn`;
 
     return (
-        <div>
-            <div className='status'>{currentStatus}</div>
+        <div className="game-container">
+            <div className="status">{currentStatus}</div>
             <div className="board">
-                <div className="board-row">
-                    {renderSquare(0)}
-                    {renderSquare(1)}
-                    {renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {renderSquare(3)}
-                    {renderSquare(4)}
-                    {renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {renderSquare(6)}
-                    {renderSquare(7)}
-                    {renderSquare(8)}
-                </div>
+                {Array.from({ length: 9 }).map((_, index) => renderSquare(index))}
+            </div>
+            <div className='play-again-leave-space'>
+                {(winner || isBoardFull(board)) && (
+                    <button className="play-again" onClick={resetGame}>
+                        Play Again
+                    </button>
+                )}
             </div>
         </div>
     );

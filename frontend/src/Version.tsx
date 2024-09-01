@@ -1,4 +1,5 @@
 import React from 'react';
+import './App.css';
 
 const Version = () => {
     const now = new Date();
@@ -8,7 +9,7 @@ const Version = () => {
     const version = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '20px', color: '#fff' }}>
+        <div className='Version'>
             Version: {version}
         </div>
     );
