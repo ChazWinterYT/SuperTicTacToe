@@ -7,8 +7,8 @@ const TicTacToeBoard3x3: React.FC = () => {
 
     const handleClick = (index: number) => {
         const newBoard = board.slice();
-        if (newBoard[index]) {
-            // Don't allow user to place X or O if the cell is already filled
+        if (newBoard[index] || winner) {
+            // Block moves if the square is already occupied or there is a winner already
             return;
         }
         newBoard[index] = isXNext ? 'X' : 'O';
