@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: app.main.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.10
       MemorySize: 512
       Timeout: 10
       Events:

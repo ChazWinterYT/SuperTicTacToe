@@ -73,4 +73,8 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str, player: str):
             if index is not None and player in ["X", "O"]:
                 await manager.handle_move(game_id, index, player)
     except WebSocketDisconnect:
-        manager.disconnect(websocket, game_id)
+        await manager.disconnect(websocket, game_id)
+
+@router.get("/api/game/start")
+async def start_game():
+    return {"message": "Game started"}
