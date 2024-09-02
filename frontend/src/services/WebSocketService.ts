@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+const apiUrl = process.env.TIC_TAC_TOE_API_BASE_URL;
+
 interface GameState {
     board: (string | null)[];
     isXNext: boolean;
@@ -19,7 +21,7 @@ const useWebSocket = (gameId: string, player: string) => {
     const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const socket = new WebSocket(`ws://localhost:8000/ws/${gameId}/${player}`);
+        const socket = new WebSocket(`${apiUrl}/ws/${gameId}/${player}`);
         
         socket.onopen = () => {
             console.log("WebSocket connected!");
