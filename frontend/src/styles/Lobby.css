@@ -1,0 +1,38 @@
+.lobby {
+    margin: 20px;
+    padding: 20px;
+    background-color: #5d5683;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.lobby h2 {
+    color: #ffffff;
+}
+
+.lobby ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.lobby li {
+    margin-bottom: 10px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lobby button {
+    padding: 5px 10px;
+    background-color: #4b3377;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.lobby button:hover {
+    background-color: #6b5b95;
+}

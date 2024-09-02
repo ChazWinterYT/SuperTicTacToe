@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const BASE_URL = process.env.TIC_TAC_TOE_API_BASE_URL;
+const BASE_URL = process.env.REACT_APP_TIC_TAC_TOE_API_BASE_URL;
 
 interface JoinLobbyProps {
     onJoin: (playerId: string) => void;
@@ -17,7 +17,7 @@ const JoinLobby: React.FC<JoinLobbyProps> = ({ onJoin }) => {
     const handleJoin = async () => {
         try {
             const response = await axios.post<JoinLobbyResponse>(
-                `${process.env.REACT_APP_TIC_TAC_TOE_API_BASE_URL}/lobby/join?player_name=${playerName}`
+                `${BASE_URL}/lobby/join?player_name=${playerName}`
             );
             const playerId = response.data.player_id;
             onJoin(playerId);
