@@ -1,8 +1,10 @@
 import uuid
 from fastapi import APIRouter
 from .models import Player
+from .websocket import ConnectionManager
 
 router = APIRouter()
+manager = ConnectionManager()
 
 # Store player list in memory for now.
 players = {}
@@ -26,11 +28,13 @@ def join_lobby(player_name: str):
     }
 
 @router.post("/challenge")
-def challenge_player(challenger_id: str, challenged_player_id: str):
-    """Handles sending a challenge from one player to another"""
+async def challenge_player(challenger_id: str, challenged_player_id: str):
     if challenger_id in players and challenged_player_id in players:
-        # TODO: Trigger a WebSocket event to notify the player being challenged
-        return {
-            "message": f"Player {challenger_id} challenged player {challenged_player_id}"
-        }
+        # Send a WebSocket message to the challenged player
+        await manager.send_personal_message(
+            f"You have been challenged by {players[challenger_id]['name']}!",
+            challenged_player_id
+        )
+        return {"message": f"Player {challenger_id} challenged player {challenged_player_id}"}
     return {"error": "Player not found"}
+
