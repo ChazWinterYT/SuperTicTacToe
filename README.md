@@ -1,39 +1,25 @@
-# SuperTicTacToe
-Tic Tac Toe game, potentially with multiplayer support
+# Project Structure
 
-# Files
-TicTacToeProject/
-│
-├── frontend/                # Frontend codebase
-│   ├── public/              # Public assets (favicon, index.html, etc.)
-│   ├── src/                 # React source files
-│   │   ├── components/      # Reusable components
-│   │   │   ├── TicTacToeBoard3x3.tsx  # Main Tic Tac Toe game component
-│   │   │   ├── Lobby.tsx               # Lobby component for player list and challenges
-│   │   │   └── Version.tsx             # Version component to display app version
-│   │   ├── services/        # Service files for WebSocket, API calls
-│   │   │   ├── WebSocketService.ts     # WebSocket service for real-time communication
-│   │   ├── App.tsx          # Main application component
-│   │   ├── index.tsx        # Entry point for React
-│   │   ├── App.css          # Global styles
-│   │   └── index.css        # Root styles
-│   ├── package.json         # NPM dependencies and scripts
-│   ├── tsconfig.json        # TypeScript configuration
-│   └── .env                 # Environment variables
-│
-├── backend/                 # Backend codebase
-│   ├── app/                 # FastAPI application
-│   │   ├── main.py          # Entry point for FastAPI
-│   │   ├── lobby.py         # Lobby management (players, challenges)
-│   │   ├── game_logic.py    # Game logic and state management
-│   │   ├── websocket.py     # WebSocket handling for real-time communication
-│   │   ├── models.py        # Data models (Player, GameState)
-│   │   ├── utils.py         # Utility functions (e.g., ID generation)
-│   │   └── __init__.py      # Python package initialization
-│   ├── requirements.txt     # Python dependencies
-│   ├── template.yaml        # SAM template for AWS deployment
-│   └── samconfig.toml       # SAM configuration file
-│
-├── .gitignore               # Files and directories to be ignored by Git
-├── README.md                # Project documentation (this file)
-└── deploy.yml               # GitHub Actions workflow for deployment
+This project is organized into two main parts: the frontend and the backend. The frontend is responsible for the user interface and game interactions, while the backend handles the game logic, player management, and real-time communication.
+
+## Frontend (React + TypeScript)
+
+- **components/**: Contains all reusable React components, including the game board (`TicTacToeBoard3x3.tsx`), lobby (`Lobby.tsx`), and version display (`Version.tsx`).
+- **services/**: Contains service files for handling WebSocket connections and API calls.
+- **App.tsx**: The main component that orchestrates the application layout and integrates the game board and lobby.
+- **public/**: Contains static assets like the HTML template and favicon.
+
+## Backend (FastAPI + WebSocket)
+
+- **app/**: Contains the core FastAPI application, including:
+  - **main.py**: The entry point that initializes the FastAPI app and includes routers.
+  - **lobby.py**: Handles player management, such as joining the lobby and challenging other players.
+  - **game.py**: Manages game state and logic.
+  - **websocket.py**: Manages WebSocket connections for real-time communication between players.
+  - **models.py**: Defines data models like `Player` and `GameState`.
+  - **utils.py**: Contains utility functions like game ID generation.
+  
+- **requirements.txt**: Lists the Python packages required for the backend.
+- **template.yaml**: AWS SAM template for deploying the backend to AWS Lambda and API Gateway.
+- **samconfig.toml**: Configuration file for SAM CLI to manage deployment settings.
+
