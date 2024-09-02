@@ -18,7 +18,7 @@ const TicTacToeBoard3x3: React.FC<TicTacToeBoard3x3Props> = ({ gameId, player })
     };
 
     const renderSquare = (index: number) => (
-        <button key={index} onClick={() => handleClick(index)}>
+        <button key={index} className="square" onClick={() => handleClick(index)}>
             {gameState.board[index]}
         </button>
     );
@@ -42,7 +42,7 @@ const TicTacToeBoard3x3: React.FC<TicTacToeBoard3x3Props> = ({ gameId, player })
             <div className="board">
                 {Array.from({ length: 9 }).map((_, index) => renderSquare(index))}
             </div>
-            <div className="play-again-placeholder">
+            <div className="play-again-leave-space">
                 {(gameState.winner || gameState.isDraw) && (
                     <button className="play-again" onClick={resetGame}>
                         Play Again

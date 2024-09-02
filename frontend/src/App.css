@@ -32,6 +32,23 @@
   color: #61dafb;
 }
 
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  padding: 20px;
+}
+
+.Lobby {
+  width: 300px;
+  height: 100%;
+  background-color: #23272A; 
+  color: #FFFFFF;
+  padding: 10px;
+  overflow-y: auto;
+}
+
 .Version {
   text-align: center;
   color: #fff;
