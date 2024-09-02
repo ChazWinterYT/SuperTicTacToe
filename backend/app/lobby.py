@@ -10,9 +10,9 @@ players = {}
 @router.get("/players")
 def get_players():
     """Returns the list of players currently in the lobby"""
-    return (
-        "players": list(players.values())
-    )
+    return {
+        "players": list(players.values())    
+    }
 
 @router.post("/join")
 def join_lobby(player_name: str):
