@@ -14,7 +14,7 @@ This project is organized into two main parts: the frontend and the backend. The
 - **app/**: Contains the core FastAPI application, including:
   - **main.py**: The entry point that initializes the FastAPI app and includes routers.
   - **lobby.py**: Handles player management, such as joining the lobby and challenging other players.
-  - **game.py**: Manages game state and logic.
+  - **game_logic.py**: Manages game state and logic.
   - **websocket.py**: Manages WebSocket connections for real-time communication between players.
   - **models.py**: Defines data models like `Player` and `GameState`.
   - **utils.py**: Contains utility functions like game ID generation.
