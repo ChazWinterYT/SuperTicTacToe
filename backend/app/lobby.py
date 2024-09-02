@@ -19,7 +19,7 @@ def join_lobby(player_name: str):
     """Allows a player to join the lobby"""
     player_id = str(uuid.uuid4())
     player = Player(id=player_id, name=player_name)
-    players[player_id] = player.dict()
+    players[player_id] = player.model_dump()
     return {
         "player_id": player_id,
         "message": f"{player_name} joined the lobby"
@@ -31,6 +31,6 @@ def challenge_player(challenger_id: str, challenged_player_id: str):
     if challenger_id in players and challenged_player_id in players:
         # TODO: Trigger a WebSocket event to notify the player being challenged
         return {
-            "message": f"Player {challenger_id} challenged player {challenged_player_id}!"
+            "message": f"Player {challenger_id} challenged player {challenged_player_id}"
         }
     return {"error": "Player not found"}

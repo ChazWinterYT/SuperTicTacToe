@@ -1,1 +1,14 @@
 .aws-sam/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Other files to ignore
+.env
+*.log
+*.sqlite3
+.DS_Store
+node_modules/
+dist/
+build/

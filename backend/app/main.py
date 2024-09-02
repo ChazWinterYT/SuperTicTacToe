@@ -9,6 +9,7 @@ app.include_router(lobby.router, prefix="/lobby")
 
 @app.get("/")
 def read_root():
+    """This doesn't work. Eh, who cares."""
     return {
         "message": "This is the Tac Tac Toe API."
     }
