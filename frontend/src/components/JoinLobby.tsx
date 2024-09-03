@@ -5,7 +5,7 @@ import '../styles/JoinLobby.css';
 const BASE_URL = process.env.REACT_APP_TIC_TAC_TOE_API_BASE_URL;
 
 interface JoinLobbyProps {
-    onJoin: (playerName: string) => void;
+    onJoin: (playerId: string) => void;
 }
 
 interface JoinLobbyResponse {
@@ -20,8 +20,7 @@ const JoinLobby: React.FC<JoinLobbyProps> = ({ onJoin }) => {
         if (playerName.trim()) {
             try {
                 const response = await axios.post<JoinLobbyResponse>(
-                    `${BASE_URL}/lobby/join`,
-                    { playerName: playerName.trim() }
+                    `${BASE_URL}/lobby/join?player_name=${playerName.trim()}`,
                 );
                 const playerId = response.data.player_id;
                 onJoin(playerId);
@@ -30,7 +29,6 @@ const JoinLobby: React.FC<JoinLobbyProps> = ({ onJoin }) => {
             }
         }
     };
-    
 
     return (
         <div className="join-lobby-container">
