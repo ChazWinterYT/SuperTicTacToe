@@ -1,7 +1,11 @@
 import uuid
+import boto3
 from fastapi import APIRouter
 from .models import Player
 from .websocket import ConnectionManager
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('TicTacToeLobby')
 
 router = APIRouter()
 manager = ConnectionManager()
@@ -12,8 +16,9 @@ players = {}
 @router.get("/players")
 def get_players():
     """Returns the list of players currently in the lobby"""
+    response = table.scan()
     return {
-        "players": list(players.values())    
+        "players": response['Items']
     }
 
 @router.post("/join")
@@ -21,10 +26,18 @@ def join_lobby(player_name: str):
     """Allows a player to join the lobby"""
     player_id = str(uuid.uuid4())
     player = Player(id=player_id, name=player_name)
-    players[player_id] = player.model_dump()
+    table.put_item(Item=player)
     return {
         "player_id": player_id,
         "message": f"{player_name} joined the lobby"
+    }
+
+@router.post("/leave")
+def leave_lobby(player_id: str):
+    """Allows a player to leave the lobby"""
+    table.delete_item(Key={"player_id": player_id})
+    return {
+        "message": f"Player {player_id} left the lobby"
     }
 
 @router.post("/challenge")
