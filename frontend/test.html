@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <input id="message" type="text" placeholder="Enter message">
+    <button onclick="sendMessage()">Send</button>
+    <pre id="output"></pre>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8000/ws/game_id/player_id");
+
+        ws.onmessage = function(event) {
+            document.getElementById("output").textContent += event.data + "\n";
+        };
+
+        function sendMessage() {
+            const message = document.getElementById("message").value;
+            ws.send(JSON.stringify({ index: message }));
+        }
+    </script>
+</body>
+</html>
