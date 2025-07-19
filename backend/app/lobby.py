@@ -5,7 +5,7 @@ from .models import Player
 from .websocket import ConnectionManager
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('TicTacToeLobby')
+table = dynamodb.Table('TacTacToeLobby')
 
 router = APIRouter()
 manager = ConnectionManager()
