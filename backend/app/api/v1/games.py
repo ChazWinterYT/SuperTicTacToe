@@ -74,7 +74,7 @@ async def create_game(
             game_state=game.game_state.to_dict() if game.game_state else None
         )
     except (GameError, ValidationError) as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.post("/{game_id}/join/{player_id}", response_model=GameResponse)
@@ -101,7 +101,7 @@ async def join_game(
             game_state=game.game_state.to_dict() if game.game_state else None
         )
     except GameError as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.post("/{game_id}/start/{player_id}", response_model=GameResponse)
@@ -128,7 +128,7 @@ async def start_game(
             game_state=game.game_state.to_dict() if game.game_state else None
         )
     except GameError as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.post("/{game_id}/move/{player_id}")
@@ -143,7 +143,7 @@ async def make_move(
         game_state = await game_service.make_move(game_id, player_id, request.position)
         return game_state
     except GameError as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.get("/{game_id}", response_model=GameResponse)
@@ -219,15 +219,9 @@ async def delete_game(
     player_id: str,
     game_service: GameServiceDep
 ) -> dict:
-    """Delete a game (only creator can delete)."""
+    """Delete a game."""
     try:
-        success = await game_service.delete_game(game_id, player_id)
-        if success:
-            return {"message": f"Game {game_id} deleted successfully"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Game not found"
-            )
+        await game_service.delete_game(game_id, player_id)
+        return {"message": f"Game {game_id} deleted successfully"}
     except GameError as e:
-        raise handle_super_tictactoe_exception(e) 
+        return handle_super_tictactoe_exception(e) 

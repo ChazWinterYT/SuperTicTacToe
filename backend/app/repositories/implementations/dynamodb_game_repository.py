@@ -1,8 +1,9 @@
 import boto3
 from typing import List, Optional
 from datetime import datetime
+from botocore.exceptions import ClientError, NoCredentialsError, EndpointConnectionError
 from app.core.config import settings
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, DatabaseError
 from app.domain.entities.game import Game
 from app.domain.value_objects.board_size import BoardSize
 from app.repositories.interfaces.game_repository import GameRepository
@@ -20,8 +21,10 @@ class DynamoDBGameRepository(GameRepository):
         try:
             self.table.put_item(Item=game.to_dict())
             return game
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to create game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to create game: {str(e)}")
+            raise DatabaseError(f"Unexpected error creating game: {str(e)}")
     
     async def get_by_id(self, game_id: str) -> Optional[Game]:
         """Get a game by ID."""
@@ -31,8 +34,10 @@ class DynamoDBGameRepository(GameRepository):
                 return None
             
             return self._dict_to_game(response["Item"])
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get game by ID: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get game: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting game by ID: {str(e)}")
     
     async def get_active_games(self) -> List[Game]:
         """Get all active games."""
@@ -42,8 +47,10 @@ class DynamoDBGameRepository(GameRepository):
             )
             
             return [self._dict_to_game(item) for item in response.get("Items", [])]
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get active games: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get active games: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting active games: {str(e)}")
     
     async def get_games_by_player(self, player_id: str) -> List[Game]:
         """Get all games for a specific player."""
@@ -54,8 +61,10 @@ class DynamoDBGameRepository(GameRepository):
             )
             
             return [self._dict_to_game(item) for item in response.get("Items", [])]
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get games by player: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get games by player: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting games by player: {str(e)}")
     
     async def get_public_games(self) -> List[Game]:
         """Get all public games that are waiting for players."""
@@ -66,8 +75,10 @@ class DynamoDBGameRepository(GameRepository):
             )
             
             return [self._dict_to_game(item) for item in response.get("Items", [])]
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get public games: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get public games: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting public games: {str(e)}")
     
     async def get_games_by_board_size(self, board_size: BoardSize) -> List[Game]:
         """Get games by board size."""
@@ -78,24 +89,30 @@ class DynamoDBGameRepository(GameRepository):
             )
             
             return [self._dict_to_game(item) for item in response.get("Items", [])]
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get games by board size: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get games by board size: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting games by board size: {str(e)}")
     
     async def update(self, game: Game) -> Game:
         """Update a game."""
         try:
             self.table.put_item(Item=game.to_dict())
             return game
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to update game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to update game: {str(e)}")
+            raise DatabaseError(f"Unexpected error updating game: {str(e)}")
     
     async def delete(self, game_id: str) -> bool:
         """Delete a game."""
         try:
             response = self.table.delete_item(Key={"id": game_id})
             return "Attributes" in response
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to delete game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to delete game: {str(e)}")
+            raise DatabaseError(f"Unexpected error deleting game: {str(e)}")
     
     async def add_player_to_game(self, game_id: str, player_id: str) -> bool:
         """Add a player to a game."""
@@ -108,8 +125,10 @@ class DynamoDBGameRepository(GameRepository):
             # For now, just update the game
             await self.update(game)
             return True
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to add player to game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to add player to game: {str(e)}")
+            raise DatabaseError(f"Unexpected error adding player to game: {str(e)}")
     
     async def remove_player_from_game(self, game_id: str, player_id: str) -> bool:
         """Remove a player from a game."""
@@ -122,8 +141,10 @@ class DynamoDBGameRepository(GameRepository):
             # For now, just update the game
             await self.update(game)
             return True
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to remove player from game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to remove player from game: {str(e)}")
+            raise DatabaseError(f"Unexpected error removing player from game: {str(e)}")
     
     async def start_game(self, game_id: str) -> bool:
         """Start a game."""
@@ -135,8 +156,10 @@ class DynamoDBGameRepository(GameRepository):
             game.start_game()
             await self.update(game)
             return True
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to start game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to start game: {str(e)}")
+            raise DatabaseError(f"Unexpected error starting game: {str(e)}")
     
     async def end_game(self, game_id: str) -> bool:
         """End a game."""
@@ -148,8 +171,10 @@ class DynamoDBGameRepository(GameRepository):
             game.finished_at = datetime.utcnow()
             await self.update(game)
             return True
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to end game: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to end game: {str(e)}")
+            raise DatabaseError(f"Unexpected error ending game: {str(e)}")
     
     def _dict_to_game(self, data: dict) -> Game:
         """Convert dictionary to Game entity."""

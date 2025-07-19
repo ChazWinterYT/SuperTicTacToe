@@ -1,8 +1,9 @@
 import boto3
 from typing import List, Optional
 from datetime import datetime
+from botocore.exceptions import ClientError, NoCredentialsError, EndpointConnectionError
 from app.core.config import settings
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, DatabaseError
 from app.domain.entities.player import Player
 from app.repositories.interfaces.player_repository import PlayerRepository
 
@@ -19,8 +20,10 @@ class DynamoDBPlayerRepository(PlayerRepository):
         try:
             self.table.put_item(Item=player.to_dict())
             return player
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to create player: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to create player: {str(e)}")
+            raise DatabaseError(f"Unexpected error creating player: {str(e)}")
     
     async def get_by_id(self, player_id: str) -> Optional[Player]:
         """Get a player by ID."""
@@ -30,24 +33,29 @@ class DynamoDBPlayerRepository(PlayerRepository):
                 return None
             
             return Player.from_dict(response["Item"])
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get player by ID: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get player: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting player by ID: {str(e)}")
     
     async def get_by_name(self, name: str) -> Optional[Player]:
         """Get a player by name."""
         try:
             response = self.table.scan(
-                FilterExpression="name = :name",
+                FilterExpression="#player_name = :name",
+                ExpressionAttributeNames={"#player_name": "name"},
                 ExpressionAttributeValues={":name": name}
             )
-            
+
             items = response.get("Items", [])
             if not items:
                 return None
-            
+
             return Player.from_dict(items[0])
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get player by name: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get player by name: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting player by name: {str(e)}")
     
     async def get_all_online(self) -> List[Player]:
         """Get all online players."""
@@ -58,8 +66,10 @@ class DynamoDBPlayerRepository(PlayerRepository):
             )
             
             return [Player.from_dict(item) for item in response.get("Items", [])]
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get online players: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get online players: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting online players: {str(e)}")
     
     async def get_all_in_lobby(self) -> List[Player]:
         """Get all players currently in the lobby (not in a game)."""
@@ -70,8 +80,10 @@ class DynamoDBPlayerRepository(PlayerRepository):
             )
             
             return [Player.from_dict(item) for item in response.get("Items", [])]
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to get lobby players: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to get lobby players: {str(e)}")
+            raise DatabaseError(f"Unexpected error getting lobby players: {str(e)}")
     
     async def update(self, player: Player) -> Player:
         """Update a player."""
@@ -81,16 +93,20 @@ class DynamoDBPlayerRepository(PlayerRepository):
             
             self.table.put_item(Item=player.to_dict())
             return player
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to update player: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to update player: {str(e)}")
+            raise DatabaseError(f"Unexpected error updating player: {str(e)}")
     
     async def delete(self, player_id: str) -> bool:
         """Delete a player."""
         try:
             response = self.table.delete_item(Key={"id": player_id})
             return "Attributes" in response
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to delete player: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to delete player: {str(e)}")
+            raise DatabaseError(f"Unexpected error deleting player: {str(e)}")
     
     async def mark_offline(self, player_id: str) -> bool:
         """Mark a player as offline."""
@@ -102,8 +118,10 @@ class DynamoDBPlayerRepository(PlayerRepository):
             player.go_offline()
             await self.update(player)
             return True
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to mark player offline: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to mark player offline: {str(e)}")
+            raise DatabaseError(f"Unexpected error marking player offline: {str(e)}")
     
     async def update_last_seen(self, player_id: str) -> bool:
         """Update a player's last seen timestamp."""
@@ -115,5 +133,7 @@ class DynamoDBPlayerRepository(PlayerRepository):
             player.update_last_seen()
             await self.update(player)
             return True
+        except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
+            raise DatabaseError(f"Failed to update last seen: {str(e)}")
         except Exception as e:
-            raise Exception(f"Failed to update last seen: {str(e)}") 
+            raise DatabaseError(f"Unexpected error updating last seen: {str(e)}") 

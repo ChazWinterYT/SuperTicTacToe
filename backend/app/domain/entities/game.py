@@ -54,7 +54,7 @@ class Game:
     @property
     def is_active(self) -> bool:
         """Check if the game is currently active."""
-        return self.started_at and not self.finished_at
+        return bool(self.started_at and not self.finished_at)
     
     def add_player(self, player: Player) -> None:
         """Add a player to the game."""
@@ -163,6 +163,9 @@ class Game:
     
     def _check_winning_sequences(self, symbol: str, position: int) -> List[List[int]]:
         """Check for winning sequences after a move."""
+        if not self.game_state:
+            return []
+            
         winning_sequences = []
         all_sequences = self.board_size.get_winning_sequences()
         
@@ -194,6 +197,9 @@ class Game:
     
     def _update_player_score(self, player_id: str, points: int, sequences: int) -> None:
         """Update a player's score."""
+        if not self.game_state:
+            return
+            
         for i, player_score in enumerate(self.game_state.players):
             if player_score.player_id == player_id:
                 self.game_state.players[i] = player_score.add_points(points, sequences)
@@ -201,6 +207,9 @@ class Game:
     
     def _should_end_game(self) -> bool:
         """Determine if the game should end."""
+        if not self.game_state:
+            return False
+            
         # Game ends when board is full or a player has a significant lead
         if self.game_state.move_count >= self.board_size.total_cells:
             return True
@@ -214,6 +223,9 @@ class Game:
     
     def _end_game(self) -> None:
         """End the game and determine winner."""
+        if not self.game_state:
+            return
+            
         self.finished_at = datetime.utcnow()
         self.game_state.status = GameStatus.FINISHED
         

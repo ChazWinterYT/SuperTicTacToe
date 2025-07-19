@@ -61,7 +61,7 @@ async def join_lobby(
             message=f"{player.name} joined the lobby"
         )
     except (LobbyError, ValidationError) as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.delete("/leave/{player_id}")
@@ -74,7 +74,7 @@ async def leave_lobby(
         await lobby_service.leave_lobby(player_id)
         return {"message": f"Player {player_id} left the lobby"}
     except LobbyError as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.get("/players", response_model=LobbyPlayersResponse)
@@ -154,7 +154,7 @@ async def challenge_player(
         
         return ChallengeResponse(**result)
     except LobbyError as e:
-        raise handle_super_tictactoe_exception(e)
+        return handle_super_tictactoe_exception(e)
 
 
 @router.get("/player/{player_id}", response_model=PlayerResponse)

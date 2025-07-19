@@ -24,41 +24,39 @@ def create_app() -> FastAPI:
     )
     
     # Add exception handlers
-    app.add_exception_handler(
-        SuperTicTacToeException,
-        lambda request, exc: handle_super_tictactoe_exception(exc)
-    )
+    def exception_handler(request, exc: SuperTicTacToeException):
+        return handle_super_tictactoe_exception(exc)
+    
+    app.add_exception_handler(SuperTicTacToeException, exception_handler)
     
     # Include API routers
     app.include_router(lobby.router, prefix=f"{settings.api_v1_prefix}/lobby", tags=["lobby"])
     app.include_router(games.router, prefix=f"{settings.api_v1_prefix}/games", tags=["games"])
     app.include_router(websocket.router, prefix=f"{settings.api_v1_prefix}/ws", tags=["websocket"])
     
+    @app.get("/")
+    async def read_root():
+        """Root endpoint with API information."""
+        return {
+            "message": f"Welcome to {settings.app_name}",
+            "version": settings.app_version,
+            "docs": "/docs",
+            "redoc": "/redoc"
+        }
+
+    @app.get("/health")
+    async def health_check():
+        """Health check endpoint."""
+        return {
+            "status": "healthy",
+            "version": settings.app_version
+        }
+    
     return app
 
 
 # Create the application instance
 app = create_app()
-
-
-@app.get("/")
-async def read_root():
-    """Root endpoint with API information."""
-    return {
-        "message": f"Welcome to {settings.app_name}",
-        "version": settings.app_version,
-        "docs": "/docs",
-        "redoc": "/redoc"
-    }
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "version": settings.app_version
-    }
 
 
 # AWS Lambda Handler

@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
 
 
 class SuperTicTacToeException(Exception):
@@ -31,7 +32,7 @@ class ValidationError(SuperTicTacToeException):
         )
 
 
-class NotFoundError(SuperTicTacTacToeException):
+class NotFoundError(SuperTicTacToeException):
     """Raised when a resource is not found."""
     
     def __init__(self, resource: str, resource_id: str):
@@ -40,6 +41,18 @@ class NotFoundError(SuperTicTacTacToeException):
             error_code="NOT_FOUND",
             status_code=status.HTTP_404_NOT_FOUND,
             details={"resource": resource, "resource_id": resource_id}
+        )
+
+
+class DatabaseError(SuperTicTacToeException):
+    """Raised when database operations fail."""
+    
+    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            message=message,
+            error_code="DATABASE_ERROR",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            details=details
         )
 
 
@@ -79,11 +92,11 @@ class WebSocketError(SuperTicTacToeException):
         )
 
 
-def handle_super_tictactoe_exception(exc: SuperTicTacToeException) -> HTTPException:
-    """Convert custom exceptions to FastAPI HTTP exceptions."""
-    return HTTPException(
+def handle_super_tictactoe_exception(exc: SuperTicTacToeException) -> JSONResponse:
+    """Convert custom exceptions to FastAPI JSON responses."""
+    return JSONResponse(
         status_code=exc.status_code,
-        detail={
+        content={
             "error_code": exc.error_code,
             "message": exc.message,
             "details": exc.details
