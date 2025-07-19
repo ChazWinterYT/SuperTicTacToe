@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from app.api.dependencies import LobbyServiceDep
-from app.core.exceptions import LobbyError, ValidationError, handle_super_tictactoe_exception
+from app.core.exceptions import LobbyError, ValidationError
 from app.domain.entities.player import Player
 
 
@@ -52,16 +52,13 @@ async def join_lobby(
     lobby_service: LobbyServiceDep
 ) -> JoinLobbyResponse:
     """Join the lobby with a new player."""
-    try:
-        player = await lobby_service.join_lobby(request.player_name)
-        
-        return JoinLobbyResponse(
-            player_id=player.id,
-            player_name=player.name,
-            message=f"{player.name} joined the lobby"
-        )
-    except (LobbyError, ValidationError) as e:
-        return handle_super_tictactoe_exception(e)
+    player = await lobby_service.join_lobby(request.player_name)
+    
+    return JoinLobbyResponse(
+        player_id=player.id,
+        player_name=player.name,
+        message=f"{player.name} joined the lobby"
+    )
 
 
 @router.delete("/leave/{player_id}")
@@ -70,11 +67,8 @@ async def leave_lobby(
     lobby_service: LobbyServiceDep
 ) -> dict:
     """Leave the lobby."""
-    try:
-        await lobby_service.leave_lobby(player_id)
-        return {"message": f"Player {player_id} left the lobby"}
-    except LobbyError as e:
-        return handle_super_tictactoe_exception(e)
+    await lobby_service.leave_lobby(player_id)
+    return {"message": f"Player {player_id} left the lobby"}
 
 
 @router.get("/players", response_model=LobbyPlayersResponse)
@@ -82,30 +76,24 @@ async def get_lobby_players(
     lobby_service: LobbyServiceDep
 ) -> LobbyPlayersResponse:
     """Get all players currently in the lobby."""
-    try:
-        players = await lobby_service.get_lobby_players()
-        
-        return LobbyPlayersResponse(
-            players=[
-                PlayerResponse(
-                    id=player.id,
-                    name=player.name,
-                    is_online=player.is_online,
-                    current_game_id=player.current_game_id,
-                    games_played=player.games_played,
-                    games_won=player.games_won,
-                    total_score=player.total_score,
-                    win_rate=player.win_rate,
-                    average_score=player.average_score
-                )
-                for player in players
-            ]
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get lobby players: {str(e)}"
-        )
+    players = await lobby_service.get_lobby_players()
+    
+    return LobbyPlayersResponse(
+        players=[
+            PlayerResponse(
+                id=player.id,
+                name=player.name,
+                is_online=player.is_online,
+                current_game_id=player.current_game_id,
+                games_played=player.games_played,
+                games_won=player.games_won,
+                total_score=player.total_score,
+                win_rate=player.win_rate,
+                average_score=player.average_score
+            )
+            for player in players
+        ]
+    )
 
 
 @router.get("/online", response_model=LobbyPlayersResponse)
@@ -113,30 +101,24 @@ async def get_online_players(
     lobby_service: LobbyServiceDep
 ) -> LobbyPlayersResponse:
     """Get all online players."""
-    try:
-        players = await lobby_service.get_online_players()
-        
-        return LobbyPlayersResponse(
-            players=[
-                PlayerResponse(
-                    id=player.id,
-                    name=player.name,
-                    is_online=player.is_online,
-                    current_game_id=player.current_game_id,
-                    games_played=player.games_played,
-                    games_won=player.games_won,
-                    total_score=player.total_score,
-                    win_rate=player.win_rate,
-                    average_score=player.average_score
-                )
-                for player in players
-            ]
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get online players: {str(e)}"
-        )
+    players = await lobby_service.get_online_players()
+    
+    return LobbyPlayersResponse(
+        players=[
+            PlayerResponse(
+                id=player.id,
+                name=player.name,
+                is_online=player.is_online,
+                current_game_id=player.current_game_id,
+                games_played=player.games_played,
+                games_won=player.games_won,
+                total_score=player.total_score,
+                win_rate=player.win_rate,
+                average_score=player.average_score
+            )
+            for player in players
+        ]
+    )
 
 
 @router.post("/challenge/{challenger_id}", response_model=ChallengeResponse)
@@ -146,15 +128,12 @@ async def challenge_player(
     lobby_service: LobbyServiceDep
 ) -> ChallengeResponse:
     """Challenge another player to a game."""
-    try:
-        result = await lobby_service.challenge_player(
-            challenger_id, 
-            request.challenged_player_id
-        )
-        
-        return ChallengeResponse(**result)
-    except LobbyError as e:
-        return handle_super_tictactoe_exception(e)
+    result = await lobby_service.challenge_player(
+        challenger_id, 
+        request.challenged_player_id
+    )
+    
+    return ChallengeResponse(**result)
 
 
 @router.get("/player/{player_id}", response_model=PlayerResponse)
@@ -163,27 +142,21 @@ async def get_player(
     lobby_service: LobbyServiceDep
 ) -> PlayerResponse:
     """Get a specific player."""
-    try:
-        player = await lobby_service.get_player(player_id)
-        if not player:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Player not found"
-            )
-        
-        return PlayerResponse(
-            id=player.id,
-            name=player.name,
-            is_online=player.is_online,
-            current_game_id=player.current_game_id,
-            games_played=player.games_played,
-            games_won=player.games_won,
-            total_score=player.total_score,
-            win_rate=player.win_rate,
-            average_score=player.average_score
-        )
-    except Exception as e:
+    player = await lobby_service.get_player(player_id)
+    if not player:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get player: {str(e)}"
-        ) 
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Player not found"
+        )
+    
+    return PlayerResponse(
+        id=player.id,
+        name=player.name,
+        is_online=player.is_online,
+        current_game_id=player.current_game_id,
+        games_played=player.games_played,
+        games_won=player.games_won,
+        total_score=player.total_score,
+        win_rate=player.win_rate,
+        average_score=player.average_score
+    ) 

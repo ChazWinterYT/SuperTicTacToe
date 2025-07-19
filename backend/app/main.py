@@ -25,7 +25,7 @@ def create_app() -> FastAPI:
     
     # Add exception handlers
     def exception_handler(request, exc: SuperTicTacToeException):
-        return handle_super_tictactoe_exception(exc)
+        raise handle_super_tictactoe_exception(exc)
     
     app.add_exception_handler(SuperTicTacToeException, exception_handler)
     

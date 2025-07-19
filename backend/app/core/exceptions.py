@@ -92,11 +92,11 @@ class WebSocketError(SuperTicTacToeException):
         )
 
 
-def handle_super_tictactoe_exception(exc: SuperTicTacToeException) -> JSONResponse:
-    """Convert custom exceptions to FastAPI JSON responses."""
-    return JSONResponse(
+def handle_super_tictactoe_exception(exc: SuperTicTacToeException) -> HTTPException:
+    """Convert custom exceptions to FastAPI HTTP exceptions."""
+    return HTTPException(
         status_code=exc.status_code,
-        content={
+        detail={
             "error_code": exc.error_code,
             "message": exc.message,
             "details": exc.details

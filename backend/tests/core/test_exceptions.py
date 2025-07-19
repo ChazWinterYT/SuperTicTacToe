@@ -84,6 +84,10 @@ class TestExceptionHandler:
         exc = ValidationError("Test error")
         response = handle_super_tictactoe_exception(exc)
         
-        assert isinstance(response, JSONResponse)
+        assert isinstance(response, HTTPException)
         assert response.status_code == 400
-        assert response.body.decode() == '{"error_code":"VALIDATION_ERROR","message":"Test error","details":{}}' 
+        assert response.detail == {
+            "error_code": "VALIDATION_ERROR",
+            "message": "Test error",
+            "details": {}
+        } 

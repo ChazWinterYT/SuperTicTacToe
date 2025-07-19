@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-from pydantic import ConfigDict
 from typing import Optional
 import os
 
@@ -41,10 +40,10 @@ class Settings(BaseSettings):
     base_score: int = 10
     sequence_multiplier: float = 1.5
     
-    model_config = ConfigDict(
-        env_file=".env",
-        case_sensitive=False
-    )
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": False
+    }
 
 
 # Global settings instance
