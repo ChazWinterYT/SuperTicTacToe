@@ -1,5 +1,6 @@
 from aws_cdk import (
     App, Stack,
+    RemovalPolicy,
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
     aws_apigatewayv2 as apigwv2,
@@ -23,6 +24,7 @@ class TicTacToeStack(Stack):
                                              type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             table_name=f"{prefix}-games",
+            removal_policy=RemovalPolicy.RETAIN,
         )
         games_table.add_global_secondary_index(
             index_name="PlayerIdIndex",
@@ -39,6 +41,7 @@ class TicTacToeStack(Stack):
                                              type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             table_name=f"{prefix}-players",
+            removal_policy=RemovalPolicy.RETAIN,
         )
 
         connections_table = dynamodb.Table(
@@ -47,6 +50,7 @@ class TicTacToeStack(Stack):
                                              type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             table_name=f"{prefix}-connections",
+            removal_policy=RemovalPolicy.RETAIN,
         )
 
         # ─────────────────── REST  (HttpApi) ───────────────────
