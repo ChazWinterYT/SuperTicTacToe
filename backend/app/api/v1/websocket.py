@@ -66,7 +66,8 @@ manager = ConnectionManager()
 
 # Initialize services
 player_repository = DynamoDBPlayerRepository()
-game_repository = DynamoDBGameRepository()
+player_repository = DynamoDBPlayerRepository()
+game_repository = DynamoDBGameRepository(player_repository=player_repository)
 lobby_service = LobbyService(player_repository)
 game_service = GameService(game_repository, player_repository)
 
@@ -203,4 +204,4 @@ async def websocket_lobby_endpoint(websocket: WebSocket, player_id: str):
             if player and not player.current_game_id:
                 await lobby_service.leave_lobby(player_id)
         except:
-            pass 
+            pass

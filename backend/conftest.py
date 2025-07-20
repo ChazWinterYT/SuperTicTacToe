@@ -18,6 +18,9 @@ from app.domain.entities.game import Game
 from app.domain.value_objects.board_size import BoardSize
 from test.constants import create_player_1, create_game_2
 
+# Configure pytest to use asyncio
+pytest_plugins = ["pytest_asyncio"]
+
 # Mock boto3 and botocore for tests
 @pytest.fixture(autouse=True)
 def mock_aws_services():

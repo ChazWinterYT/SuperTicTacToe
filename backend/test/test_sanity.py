@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 
 def test_simple():
     """Simple test to verify pytest is working."""
@@ -11,3 +12,8 @@ def test_import_app():
         assert app is not None
     except Exception as e:
         pytest.fail(f"Failed to import app: {e}") 
+
+@pytest.mark.asyncio
+async def test_sleep():
+    await asyncio.sleep(0.1)
+    assert True

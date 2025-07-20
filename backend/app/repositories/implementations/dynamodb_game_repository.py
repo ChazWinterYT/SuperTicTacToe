@@ -7,16 +7,23 @@ from app.core.exceptions import NotFoundError, DatabaseError
 from app.domain.entities.game import Game
 from app.domain.value_objects.board_size import BoardSize
 from app.repositories.interfaces.game_repository import GameRepository
+from app.repositories.interfaces.player_repository import PlayerRepository
 
 
 class DynamoDBGameRepository(GameRepository):
     """DynamoDB implementation of the game repository."""
 
-    def __init__(self):
+    def __init__(self, player_repository: PlayerRepository):
+        self.player_repository = player_repository
+        self.dynamodb = boto3.resource('dynamodb', region_name=settings.aws_region)
+        self.table = self.dynamodb.Table(f"{settings.dynamodb_table_name}-Games")
         self.dynamodb = boto3.resource('dynamodb', region_name=settings.aws_region)
         self.table = self.dynamodb.Table(f"{settings.dynamodb_table_name}-Games")
 
     async def create(self, game: Game) -> Game:
+        # Ensure player_repository is available
+        if not self.player_repository:
+            raise DatabaseError("Player repository is not set.")
         """Create a new game."""
         try:
             self.table.put_item(Item=game.to_dict())
@@ -171,6 +178,12 @@ class DynamoDBGameRepository(GameRepository):
 
             game.finished_at = datetime.utcnow()
             await self.update(game)
+            
+            # Clear current_game_id for each player
+            for player in game.players:
+                player.current_game_id = None
+                await self.player_repository.update(player)
+            
             return True
         except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
             raise DatabaseError(f"Failed to end game: {str(e)}")

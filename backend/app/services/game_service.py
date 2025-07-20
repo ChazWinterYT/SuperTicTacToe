@@ -75,6 +75,10 @@ class GameService:
         # Update game
         await self.game_repository.update(game)
         
+        # Update player's current_game_id
+        player.current_game_id = game_id
+        await self.player_repository.update(player)
+        
         return game
     
     async def leave_game(self, game_id: str, player_id: str) -> Game:
