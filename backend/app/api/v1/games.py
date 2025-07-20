@@ -14,7 +14,7 @@ class CreateGameRequest(BaseModel):
 
 
 class GameResponse(BaseModel):
-    id: str
+    game_id: str
     board_size: str
     max_players: int
     created_at: str
@@ -60,7 +60,7 @@ async def create_game(
     )
     
     return GameResponse(
-        game_id=game.id,
+        game_id=game.game_id,
         board_size=str(game.board_size),
         max_players=game.max_players,
         created_at=game.created_at.isoformat(),
@@ -84,7 +84,7 @@ async def join_game(
     game = await game_service.join_game(game_id, player_id)
     
     return GameResponse(
-        game_id=game.id,
+        game_id=game.game_id,
         board_size=str(game.board_size),
         max_players=game.max_players,
         created_at=game.created_at.isoformat(),
@@ -107,7 +107,7 @@ async def start_game(
     """Start a game."""
     game = await game_service.start_game(game_id, player_id)
     return GameResponse(
-        id=game.id,
+        game_id=game.game_id,
         board_size=str(game.board_size),
         max_players=game.max_players,
         created_at=game.created_at.isoformat(),
@@ -147,7 +147,7 @@ async def get_game(
         )
     
     return GameResponse(
-        id=game.id,
+        game_id=game.game_id,
         board_size=str(game.board_size),
         max_players=game.max_players,
         created_at=game.created_at.isoformat(),
@@ -171,7 +171,7 @@ async def get_public_games(
     return GamesResponse(
         games=[
             GameResponse(
-                id=game.id,
+                game_id=game.game_id,
                 board_size=str(game.board_size),
                 max_players=game.max_players,
                 created_at=game.created_at.isoformat(),

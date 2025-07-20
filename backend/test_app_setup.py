@@ -7,6 +7,7 @@ from app.main import create_app
 from app.domain.entities.player import Player
 from app.domain.entities.game import Game
 from app.domain.value_objects.board_size import BoardSize
+from test.constants import create_player_1, create_game_2
 from app.services.lobby_service import LobbyService
 from app.services.game_service import GameService
 
@@ -19,10 +20,7 @@ def get_test_player_repository():
     mock_repo = AsyncMock()
     
     # Mock player data - make it online
-    test_player = Player(
-        id="test-player-123",
-        name="TestPlayer"
-    )
+    test_player = create_player_1()
     test_player.go_online()  # Make the player online
     
     # Mock repository methods
@@ -43,12 +41,7 @@ def get_test_game_repository():
     mock_repo = AsyncMock()
     
     # Mock game data
-    test_game = Game(
-        id="test-game-123",
-        board_size=BoardSize.create_standard(),
-        max_players=2,
-        creator_id="test-player-123"
-    )
+    test_game = create_game_2()
     
     # Mock repository methods
     mock_repo.create.return_value = test_game
@@ -71,4 +64,4 @@ from app.api.dependencies import get_player_repository, get_game_repository, get
 
 # Replace the dependency functions
 app.dependency_overrides[get_player_repository] = get_test_player_repository
-app.dependency_overrides[get_game_repository] = get_test_game_repository 
+app.dependency_overrides[get_game_repository] = get_test_game_repository

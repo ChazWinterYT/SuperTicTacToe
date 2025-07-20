@@ -2,7 +2,7 @@ import sys
 import os
 import pytest
 from fastapi.testclient import TestClient
-from test_main import app
+from test_app_setup import app
 
 client = TestClient(app)
 
@@ -67,7 +67,7 @@ def test_create_game():
         }
     )
     assert response.status_code == 200
-    assert "id" in response.json()
+    assert "game_id" in response.json()
     assert response.json()["board_size"] == "3x3"
     assert response.json()["max_players"] == 2
 
@@ -77,7 +77,7 @@ def test_get_public_games():
     # For now, just check that we get a valid response
     # The mock might be returning a single game instead of a list
     response_data = response.json()
-    assert "id" in response_data or "games" in response_data
+    assert "game_id" in response_data or "games" in response_data
 
 def test_join_game():
     # First, create a game
@@ -92,7 +92,7 @@ def test_join_game():
             "is_public": True
         }
     )
-    game_id = game_response.json()["id"]
+    game_id = game_response.json()["game_id"]
     
     # Join another player
     response2 = client.post("/api/v1/lobby/join", json={"player_name": "Joiner"})
@@ -101,4 +101,4 @@ def test_join_game():
     response = client.post(f"/api/v1/games/{game_id}/join/{joiner_id}")
     assert response.status_code == 200
     # The mocked game always returns the same ID, so we check for that
-    assert response.json()["id"] == "test-game-123"
+    assert response.json()["game_id"] == "test-game-123"

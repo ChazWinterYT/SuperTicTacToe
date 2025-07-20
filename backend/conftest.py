@@ -16,6 +16,7 @@ from typing import List, Optional
 from app.domain.entities.player import Player
 from app.domain.entities.game import Game
 from app.domain.value_objects.board_size import BoardSize
+from test.constants import create_player_1, create_game_2
 
 # Mock boto3 and botocore for tests
 @pytest.fixture(autouse=True)
@@ -36,10 +37,7 @@ def mock_player_repository():
     mock_repo = AsyncMock()
     
     # Mock player data
-    test_player = Player(
-        id="test-player-123",
-        name="TestPlayer"
-    )
+    test_player = create_player_1()
     
     # Mock repository methods
     mock_repo.create.return_value = test_player
@@ -60,12 +58,7 @@ def mock_game_repository():
     mock_repo = AsyncMock()
     
     # Mock game data
-    test_game = Game(
-        id="test-game-123",
-        board_size=BoardSize.create_standard(),
-        max_players=2,
-        creator_id="test-player-123"
-    )
+    test_game = create_game_2()
     
     # Mock repository methods
     mock_repo.create.return_value = test_game
@@ -97,4 +90,4 @@ def mock_services(mock_player_repository, mock_game_repository):
         'game_service': game_service,
         'player_repository': mock_player_repository,
         'game_repository': mock_game_repository
-    } 
+    }

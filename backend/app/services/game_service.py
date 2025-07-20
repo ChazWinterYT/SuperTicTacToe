@@ -35,7 +35,7 @@ class GameService:
         
         # Create game
         game = Game(
-            id=str(uuid.uuid4()),
+            game_id=str(uuid.uuid4()),
             board_size=board_size,
             max_players=max_players,
             creator_id=creator_id,

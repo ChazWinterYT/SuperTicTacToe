@@ -24,9 +24,11 @@ class Game:
     creator_id: Optional[str] = None
     
     def __post_init__(self):
-        if not self.id:
-            self.id = str(uuid.uuid4())
+        if not self.game_id:
+            self.game_id = str(uuid.uuid4())
+        self.validate()
         
+    def validate(self) -> None:
         if self.max_players < 2:
             raise ValidationError("Game must have at least 2 players")
         
@@ -64,12 +66,12 @@ class Game:
         if self.started_at:
             raise GameError("Cannot add players to a game that has already started")
         
-        if any(p.id == player.id for p in self.players):
+        if any(p.player_id == player.player_id for p in self.players):
             raise GameError("Player is already in the game")
         
         self.players.append(player)
-        player.join_game(self.id)
-    
+        player.join_game(self.game_id)
+
     def remove_player(self, player_id: str) -> None:
         """Remove a player from the game."""
         player = self.get_player(player_id)
@@ -79,13 +81,13 @@ class Game:
         if self.is_active:
             raise GameError("Cannot remove players from an active game")
         
-        self.players = [p for p in self.players if p.id != player_id]
+        self.players = [p for p in self.players if p.player_id != player_id]
         player.leave_game()
     
     def get_player(self, player_id: str) -> Optional[Player]:
         """Get a player by ID."""
         for player in self.players:
-            if player.id == player_id:
+            if player.player_id == player_id:
                 return player
         return None
     
@@ -103,7 +105,7 @@ class Game:
         available_symbols = list(PlayerSymbol)[:self.max_players]
         player_scores = [
             PlayerScore(
-                player_id=player.id,
+                player_id=player.player_id,
                 symbol=available_symbols[i]
             )
             for i, player in enumerate(self.players)
@@ -235,15 +237,15 @@ class Game:
         
         # Update player statistics
         for player in self.players:
-            player_score = self.game_state.get_player_by_id(player.id)
+            player_score = self.game_state.get_player_by_id(player.player_id)
             if player_score:
-                won = player.id == winner.player_id
+                won = player.player_id == winner.player_id
                 player.record_game_result(won, player_score.score)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert game to dictionary for serialization."""
         return {
-            "id": self.id,
+            "game_id": self.game_id,
             "board_size": str(self.board_size),
             "max_players": self.max_players,
             "created_at": self.created_at.isoformat(),
@@ -254,4 +256,4 @@ class Game:
             "status": self.status.value,
             "is_public": self.is_public,
             "creator_id": self.creator_id
-        } 
+        }

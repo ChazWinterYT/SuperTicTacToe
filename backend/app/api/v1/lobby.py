@@ -18,8 +18,8 @@ class JoinLobbyResponse(BaseModel):
 
 
 class PlayerResponse(BaseModel):
-    id: str
-    name: str
+    player_id: str
+    player_name: str
     is_online: bool
     current_game_id: str | None
     games_played: int
@@ -27,6 +27,7 @@ class PlayerResponse(BaseModel):
     total_score: int
     win_rate: float
     average_score: float
+    elo: float
 
 
 class LobbyPlayersResponse(BaseModel):
@@ -55,9 +56,9 @@ async def join_lobby(
     player = await lobby_service.join_lobby(request.player_name)
     
     return JoinLobbyResponse(
-        player_id=player.id,
-        player_name=player.name,
-        message=f"{player.name} joined the lobby"
+        player_id=player.player_id,
+        player_name=player.player_name,
+        message=f"{player.player_name} joined the lobby"
     )
 
 
@@ -81,15 +82,16 @@ async def get_lobby_players(
     return LobbyPlayersResponse(
         players=[
             PlayerResponse(
-                id=player.id,
-                name=player.name,
+                player_id=player.player_id,
+                player_name=player.player_name,
                 is_online=player.is_online,
                 current_game_id=player.current_game_id,
                 games_played=player.games_played,
                 games_won=player.games_won,
                 total_score=player.total_score,
                 win_rate=player.win_rate,
-                average_score=player.average_score
+                average_score=player.average_score,
+                elo=player.elo
             )
             for player in players
         ]
@@ -106,15 +108,16 @@ async def get_online_players(
     return LobbyPlayersResponse(
         players=[
             PlayerResponse(
-                id=player.id,
-                name=player.name,
+                player_id=player.player_id,
+                player_name=player.player_name,
                 is_online=player.is_online,
                 current_game_id=player.current_game_id,
                 games_played=player.games_played,
                 games_won=player.games_won,
                 total_score=player.total_score,
                 win_rate=player.win_rate,
-                average_score=player.average_score
+                average_score=player.average_score,
+                elo=player.elo
             )
             for player in players
         ]
@@ -150,13 +153,14 @@ async def get_player(
         )
     
     return PlayerResponse(
-        id=player.id,
-        name=player.name,
+        player_id=player.player_id,
+        player_name=player.player_name,
         is_online=player.is_online,
         current_game_id=player.current_game_id,
         games_played=player.games_played,
         games_won=player.games_won,
         total_score=player.total_score,
         win_rate=player.win_rate,
-        average_score=player.average_score
+        average_score=player.average_score,
+        elo=player.elo
     ) 

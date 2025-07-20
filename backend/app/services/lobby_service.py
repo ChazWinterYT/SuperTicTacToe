@@ -23,8 +23,8 @@ class LobbyService:
         
         # Create new player
         player = Player(
-            id=str(uuid.uuid4()),
-            name=player_name.strip()
+            player_id=str(uuid.uuid4()),
+            player_name=player_name.strip()
         )
         
         # Save to repository
@@ -70,7 +70,7 @@ class LobbyService:
             raise LobbyError("Challenged player not found")
         
         if challenger_id == challenged_player_id:
-            raise LobbyError("Cannot challenge yourself")
+            raise LobbyError("Cannot challenge yourself!")
         
         if not challenged.is_online:
             raise LobbyError("Challenged player is not online")
@@ -81,5 +81,5 @@ class LobbyService:
         return {
             "challenger": challenger.to_dict(),
             "challenged": challenged.to_dict(),
-            "message": f"{challenger.name} challenged {challenged.name} to a game"
-        } 
+            "message": f"{challenger.player_name} challenged {challenged.player_name} to a game!"
+        }

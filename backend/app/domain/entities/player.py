@@ -22,7 +22,7 @@ class Player:
         if not self.player_name or not self.player_name.strip():
             raise ValidationError("Player name cannot be empty")
         
-        if len(self.name.strip()) > 30:
+        if len(self.player_name.strip()) > 30:
             raise ValidationError("Player name cannot exceed 30 characters")
     
     @property
@@ -48,7 +48,7 @@ class Player:
     def join_game(self, game_id: str) -> None:
         """Join a game."""
         if self.current_game_id:
-            raise ValidationError(f"Player {self.id} is already in game {self.current_game_id}")
+            raise ValidationError(f"Player {self.player_id} is already in game {self.current_game_id}")
         
         self.current_game_id = game_id
         self.is_online = True
@@ -82,8 +82,8 @@ class Player:
     def to_dict(self) -> dict:
         """Convert player to dictionary for serialization."""
         return {
-            "id": self.id,
-            "name": self.name,
+            "player_id": self.player_id,
+            "player_name": self.player_name,
             "created_at": self.created_at.isoformat(),
             "last_seen": self.last_seen.isoformat(),
             "is_online": self.is_online,
@@ -92,15 +92,16 @@ class Player:
             "games_won": self.games_won,
             "total_score": self.total_score,
             "win_rate": self.win_rate,
-            "average_score": self.average_score
+            "average_score": self.average_score,
+            "elo": self.elo
         }
     
     @classmethod
     def from_dict(cls, data: dict) -> "Player":
         """Create a player from a dictionary."""
         return cls(
-            id=data["id"],
-            name=data["name"],
+            player_id=data["player_id"],
+            player_name=data["player_name"],
             created_at=datetime.fromisoformat(data["created_at"]),
             last_seen=datetime.fromisoformat(data["last_seen"]),
             is_online=data["is_online"],

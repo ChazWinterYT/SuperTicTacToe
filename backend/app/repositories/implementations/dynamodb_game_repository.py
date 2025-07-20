@@ -189,7 +189,7 @@ class DynamoDBGameRepository(GameRepository):
         
         # Create game with basic data
         game = Game(
-            id=data["id"],
+            game_id=data["id"],
             board_size=board_size,
             max_players=data.get("max_players", 2),
             created_at=datetime.fromisoformat(data["created_at"]),
