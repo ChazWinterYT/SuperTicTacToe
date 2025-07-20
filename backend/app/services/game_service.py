@@ -16,7 +16,7 @@ class GameService:
         self.game_repository = game_repository
         self.player_repository = player_repository
     
-    def create_game(
+    async def create_game(
         self,
         board_size: BoardSize,
         max_players: int,
@@ -25,7 +25,7 @@ class GameService:
     ) -> Game:
         """Create a new game."""
         # Validate creator exists
-        creator = self.player_repository.get_by_id(creator_id)  # Change to synchronous call
+        creator = await self.player_repository.get_by_id(creator_id)
         if not creator:
             raise GameError("Creator not found")
         
@@ -50,27 +50,6 @@ class GameService:
         
         return game
     
-def lambda_handler(event, context):
-    # Extract necessary information from the event
-    board_size = event.get('board_size', BoardSize.SMALL)
-    max_players = event.get('max_players', 2)
-    is_public = event.get('is_public', True)
-    creator_id = event.get('creator_id', 'default_creator_id')
-
-    # Create a new game using the GameService
-    game_service = GameService(game_repository, player_repository)
-    game = game_service.create_game(
-        board_size=board_size,
-        max_players=max_players,
-        is_public=is_public,
-        creator_id=creator_id
-    )
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps({'game_id': game.id})
-    }
-
     async def join_game(self, game_id: str, player_id: str) -> Game:
         """Join an existing game."""
         game = await self.game_repository.get_by_id(game_id)

@@ -196,4 +196,4 @@ async def delete_game(
 ) -> dict:
     """Delete a game."""
     await game_service.delete_game(game_id, player_id)
-    return {"message": f"Game {game_id} deleted successfully"} 
+    return {"message": f"Game {game_id} deleted successfully"}

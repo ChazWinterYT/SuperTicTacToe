@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     
     # API
     api_v1_prefix: str = "/api/v1"
+    api_gateway_url: str = "http://localhost:8000"
     
     # CORS
     allowed_origins: list[str] = [
@@ -47,4 +48,4 @@ class Settings(BaseSettings):
 
 
 # Global settings instance
-settings = Settings() 
+settings = Settings()
