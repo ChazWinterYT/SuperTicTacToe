@@ -4,11 +4,17 @@
 __pycache__/
 *.py[cod]
 
+# Virtual environment
+venv/
+
+# CDK output and dependencies
+cdk.out/
+node_modules/
+
 # Other files to ignore
 .env
 *.log
 *.sqlite3
 .DS_Store
-node_modules/
 dist/
 build/
