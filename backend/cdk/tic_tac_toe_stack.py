@@ -55,6 +55,17 @@ class TicTacToeStack(Stack):
             table_name=f"{table_name_prefix}-players"
         )
 
+        # Create DynamoDB table for WebSocket connections
+        connections_table = dynamodb.Table(
+            self, "ConnectionsTable",
+            partition_key=dynamodb.Attribute(
+                name="connection_id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            table_name=f"{table_name_prefix}-connections"
+        )
+
         # Create Lambda function for the FastAPI app
         fastapi_lambda = _lambda.Function(
             self, "FastApiFunction",
@@ -84,4 +95,80 @@ class TicTacToeStack(Stack):
         CfnOutput(
             self, "ApiUrl",
             value=http_api.api_endpoint
+        )
+
+        # Create Lambda functions for WebSocket API routes
+        connect_lambda = _lambda.Function(
+            self, "ConnectFunction",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler="websocket_handlers.connect_handler",
+            code=_lambda.Code.from_asset("app"),
+            environment={
+                "CONNECTIONS_TABLE_NAME": connections_table.table_name,
+            }
+        )
+
+        disconnect_lambda = _lambda.Function(
+            self, "DisconnectFunction",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler="websocket_handlers.disconnect_handler",
+            code=_lambda.Code.from_asset("app"),
+            environment={
+                "CONNECTIONS_TABLE_NAME": connections_table.table_name,
+            }
+        )
+
+        message_lambda = _lambda.Function(
+            self, "MessageFunction",
+            runtime=_lambda.Runtime.PYTHON_3_8,
+            handler="websocket_handlers.message_handler",
+            code=_lambda.Code.from_asset("app"),
+            environment={
+                "CONNECTIONS_TABLE_NAME": connections_table.table_name,
+            }
+        )
+
+        # Grant permissions to Lambda functions to access the connections table
+        connections_table.grant_read_write_data(connect_lambda)
+        connections_table.grant_read_write_data(disconnect_lambda)
+        connections_table.grant_read_write_data(message_lambda)
+
+        # Create WebSocket API
+        websocket_api = apigwv2.WebSocketApi(
+            self, "WebSocketApi",
+            connect_route_options=apigwv2.WebSocketRouteOptions(
+                integration=apigwv2_integrations.WebSocketLambdaIntegration(
+                    "ConnectIntegration",
+                    handler=connect_lambda
+                )
+            ),
+            disconnect_route_options=apigwv2.WebSocketRouteOptions(
+                integration=apigwv2_integrations.WebSocketLambdaIntegration(
+                    "DisconnectIntegration",
+                    handler=disconnect_lambda
+                )
+            )
+        )
+
+        # Add a custom route for messages
+        websocket_api.add_route(
+            "sendMessage",
+            integration=apigwv2_integrations.WebSocketLambdaIntegration(
+                "MessageIntegration",
+                handler=message_lambda
+            )
+        )
+
+        # Create a stage for the WebSocket API
+        websocket_stage = apigwv2.WebSocketStage(
+            self, "WebSocketStage",
+            web_socket_api=websocket_api,
+            stage_name="prod",
+            auto_deploy=True
+        )
+
+        # Output the WebSocket API endpoint
+        CfnOutput(
+            self, "WebSocketApiUrl",
+            value=websocket_stage.url
         )
