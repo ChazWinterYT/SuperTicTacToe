@@ -1,25 +1,27 @@
-# Project Structure
+# Super Tic Tac Toe
 
-This project is organized into two main parts: the frontend and the backend. The frontend is responsible for the user interface and game interactions, while the backend handles the game logic, player management, and real-time communication.
+Super Tic Tac Toe is a real-time multiplayer tic tac toe game with a React frontend and FastAPI backend. It supports multiple players, game lobbies, and live game updates via WebSocket.
 
-## Frontend (React + TypeScript)
+## Features
 
-- **components/**: Contains all reusable React components, including the game board (`TicTacToeBoard3x3.tsx`), lobby (`Lobby.tsx`), and version display (`Version.tsx`).
-- **services/**: Contains service files for handling WebSocket connections and API calls.
-- **App.tsx**: The main component that orchestrates the application layout and integrates the game board and lobby.
-- **public/**: Contains static assets like the HTML template and favicon.
+- React + TypeScript frontend with reusable components
+- FastAPI backend with REST API and WebSocket support
+- Player lobby and matchmaking
+- Game state management and validation
+- Deployable to AWS Lambda using AWS SAM
 
-## Backend (FastAPI + WebSocket)
+## Project Structure
 
-- **app/**: Contains the core FastAPI application, including:
-  - **main.py**: The entry point that initializes the FastAPI app and includes routers.
-  - **lobby.py**: Handles player management, such as joining the lobby and challenging other players.
-  - **game_logic.py**: Manages game state and logic.
-  - **websocket.py**: Manages WebSocket connections for real-time communication between players.
-  - **models.py**: Defines data models like `Player` and `GameState`.
-  - **utils.py**: Contains utility functions like game ID generation.
-  
-- **requirements.txt**: Lists the Python packages required for the backend.
-- **template.yaml**: AWS SAM template for deploying the backend to AWS Lambda and API Gateway.
-- **samconfig.toml**: Configuration file for SAM CLI to manage deployment settings.
+- `frontend/`: React app source code and static assets
+- `backend/app/`: FastAPI backend source code
+- `backend/tests/`: Backend test suite
+- `backend/cdk/`: AWS CDK infrastructure code
 
+## Getting Started
+
+1. Install dependencies for frontend and backend
+2. Run backend FastAPI server locally
+3. Run frontend React app locally
+4. Access the app in your browser at `http://localhost:3000`
+
+This project is designed to be easy to understand and extend, suitable for showcasing full-stack development skills.
