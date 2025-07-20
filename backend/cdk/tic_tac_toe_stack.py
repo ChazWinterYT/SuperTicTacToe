@@ -1,174 +1,137 @@
 from aws_cdk import (
-    App,
-    Stack,
-    aws_certificatemanager as acm,
-    aws_route53 as route53,
-    aws_route53_targets as targets,
+    App, Stack,
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
     aws_apigatewayv2 as apigwv2,
     aws_apigatewayv2_integrations as apigwv2_integrations,
-    CfnOutput
+    aws_iam as iam,
+    CfnOutput, Fn
 )
 from constructs import Construct
 
+
 class TicTacToeStack(Stack):
-    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
-        super().__init__(scope, id, **kwargs)
+    def __init__(self, scope: Construct, id_: str, **kwargs) -> None:
+        super().__init__(scope, id_, **kwargs)
 
-        # Define a standard prefix for DynamoDB table names
-        table_name_prefix = "SuperTicTacToe"
+        # ─────────────────── DynamoDB ───────────────────
+        prefix = "SuperTicTacToe"
 
-        # Create DynamoDB table for games
         games_table = dynamodb.Table(
-            self, "GamesTable",
-            partition_key=dynamodb.Attribute(
-                name="game_id",
-                type=dynamodb.AttributeType.STRING
-            ),
+            self, "Games",
+            partition_key=dynamodb.Attribute(name="game_id",
+                                             type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            table_name=f"{table_name_prefix}-games"
+            table_name=f"{prefix}-games",
         )
-
-        # Add GSI for querying games by player_id
         games_table.add_global_secondary_index(
             index_name="PlayerIdIndex",
-            partition_key=dynamodb.Attribute(
-                name="player_id",
-                type=dynamodb.AttributeType.STRING
-            ),
-            sort_key=dynamodb.Attribute(
-                name="game_id",
-                type=dynamodb.AttributeType.STRING
-            ),
-            projection_type=dynamodb.ProjectionType.ALL
+            partition_key=dynamodb.Attribute(name="player_id",
+                                             type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="game_id",
+                                        type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.ALL,
         )
 
-        # Create DynamoDB table for players
         players_table = dynamodb.Table(
-            self, "PlayersTable",
-            partition_key=dynamodb.Attribute(
-                name="player_id",
-                type=dynamodb.AttributeType.STRING
-            ),
+            self, "Players",
+            partition_key=dynamodb.Attribute(name="player_id",
+                                             type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            table_name=f"{table_name_prefix}-players"
+            table_name=f"{prefix}-players",
         )
 
-        # Create DynamoDB table for WebSocket connections
         connections_table = dynamodb.Table(
-            self, "ConnectionsTable",
-            partition_key=dynamodb.Attribute(
-                name="connection_id",
-                type=dynamodb.AttributeType.STRING
-            ),
+            self, "Connections",
+            partition_key=dynamodb.Attribute(name="connection_id",
+                                             type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            table_name=f"{table_name_prefix}-connections"
+            table_name=f"{prefix}-connections",
         )
 
-        # Create Lambda function for the FastAPI app
+        # ─────────────────── REST  (HttpApi) ───────────────────
         fastapi_lambda = _lambda.Function(
-            self, "FastApiFunction",
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            self, "FastApi",
+            runtime=_lambda.Runtime.PYTHON_3_11,
             handler="main.lambda_handler",
             code=_lambda.Code.from_asset("app"),
             environment={
                 "DYNAMODB_GAMES_TABLE_NAME": games_table.table_name,
                 "DYNAMODB_PLAYERS_TABLE_NAME": players_table.table_name,
-            }
+            },
         )
-
-        # Grant Lambda permissions to access both DynamoDB tables
         games_table.grant_read_write_data(fastapi_lambda)
         players_table.grant_read_write_data(fastapi_lambda)
 
-        # Create an HTTP API Gateway with Lambda proxy integration
         http_api = apigwv2.HttpApi(
-            self, "FastApiHttpApi",
+            self, "HttpApi",
             default_integration=apigwv2_integrations.HttpLambdaIntegration(
-                "FastApiLambdaIntegration",
-                handler=fastapi_lambda
+                "FastApiIntegration", fastapi_lambda
+            ),
+        )
+        CfnOutput(self, "RestApiUrl", value=http_api.api_endpoint)
+
+        # ─────────────────── WebSocket API ───────────────────
+        def ws_lambda(id_: str, handler: str):
+            fn = _lambda.Function(
+                self, id_,
+                runtime=_lambda.Runtime.PYTHON_3_11,
+                handler=f"websocket_handlers.{handler}",
+                code=_lambda.Code.from_asset("app"),
+                environment={
+                    "CONNECTIONS_TABLE_NAME": connections_table.table_name,
+                },
             )
-        )
+            connections_table.grant_read_write_data(fn)
+            return fn
 
-        # Output the API URL
-        CfnOutput(
-            self, "ApiUrl",
-            value=http_api.api_endpoint
-        )
+        connect_fn = ws_lambda("ConnectFn", "connect_handler")
+        disconnect_fn = ws_lambda("DisconnectFn", "disconnect_handler")
+        message_fn = ws_lambda("MessageFn", "message_handler")
 
-        # Create Lambda functions for WebSocket API routes
-        connect_lambda = _lambda.Function(
-            self, "ConnectFunction",
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            handler="websocket_handlers.connect_handler",
-            code=_lambda.Code.from_asset("app"),
-            environment={
-                "CONNECTIONS_TABLE_NAME": connections_table.table_name,
-            }
-        )
-
-        disconnect_lambda = _lambda.Function(
-            self, "DisconnectFunction",
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            handler="websocket_handlers.disconnect_handler",
-            code=_lambda.Code.from_asset("app"),
-            environment={
-                "CONNECTIONS_TABLE_NAME": connections_table.table_name,
-            }
-        )
-
-        message_lambda = _lambda.Function(
-            self, "MessageFunction",
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            handler="websocket_handlers.message_handler",
-            code=_lambda.Code.from_asset("app"),
-            environment={
-                "CONNECTIONS_TABLE_NAME": connections_table.table_name,
-            }
-        )
-
-        # Grant permissions to Lambda functions to access the connections table
-        connections_table.grant_read_write_data(connect_lambda)
-        connections_table.grant_read_write_data(disconnect_lambda)
-        connections_table.grant_read_write_data(message_lambda)
-
-        # Create WebSocket API
         websocket_api = apigwv2.WebSocketApi(
             self, "WebSocketApi",
             connect_route_options=apigwv2.WebSocketRouteOptions(
                 integration=apigwv2_integrations.WebSocketLambdaIntegration(
-                    "ConnectIntegration",
-                    handler=connect_lambda
-                )
-            ),
+                    "ConnectIntegration", connect_fn)),
             disconnect_route_options=apigwv2.WebSocketRouteOptions(
                 integration=apigwv2_integrations.WebSocketLambdaIntegration(
-                    "DisconnectIntegration",
-                    handler=disconnect_lambda
-                )
-            )
+                    "DisconnectIntegration", disconnect_fn)),
         )
-
-        # Add a custom route for messages
         websocket_api.add_route(
             "sendMessage",
             integration=apigwv2_integrations.WebSocketLambdaIntegration(
-                "MessageIntegration",
-                handler=message_lambda
-            )
+                "MessageIntegration", message_fn),
         )
 
-        # Create a stage for the WebSocket API
         websocket_stage = apigwv2.WebSocketStage(
-            self, "WebSocketStage",
+            self, "ProdStage",
             web_socket_api=websocket_api,
             stage_name="prod",
-            auto_deploy=True
+            auto_deploy=True,
+        )
+        CfnOutput(self, "WebSocketWssUrl", value=websocket_stage.url)
+
+        # ─────── Derived HTTPS management URL and env-vars ───────
+        mgmt_url = Fn.join(
+            "",
+            [
+                "https://",
+                websocket_api.api_endpoint,
+                "/",
+                websocket_stage.stage_name,
+                "/@connections",
+            ],
         )
 
-        # Output the WebSocket API endpoint
-        CfnOutput(
-            self, "WebSocketApiUrl",
-            value=websocket_stage.url
-        )
+        for fn in (connect_fn, disconnect_fn, message_fn, fastapi_lambda):
+            fn.add_environment("WEBSOCKET_MGMT_URL", mgmt_url)
+
+        # ───────── Give Lambdas permission to call post_to_connection ─────────
+        for fn in (connect_fn, disconnect_fn, message_fn):
+            fn.add_to_role_policy(
+                iam.PolicyStatement(
+                    actions=["execute-api:ManageConnections"],
+                    resources=[f"arn:{self.partition}:execute-api:{self.region}:{self.account}:{websocket_api.api_id}/{websocket_stage.stage_name}/POST/@connections/*"],
+                )
+            )
