@@ -16,16 +16,16 @@ class GameService:
         self.game_repository = game_repository
         self.player_repository = player_repository
     
-    async def create_game(
+    def create_game(
         self,
-        creator_id: str,
         board_size: BoardSize,
         max_players: int,
-        is_public: bool = True
+        is_public: bool = True,
+        creator_id: str = 'default_creator_id'  # Provide a default for testing
     ) -> Game:
         """Create a new game."""
         # Validate creator exists
-        creator = await self.player_repository.get_by_id(creator_id)
+        creator = self.player_repository.get_by_id(creator_id)  # Change to synchronous call
         if not creator:
             raise GameError("Creator not found")
         
@@ -50,6 +50,27 @@ class GameService:
         
         return game
     
+def lambda_handler(event, context):
+    # Extract necessary information from the event
+    board_size = event.get('board_size', BoardSize.SMALL)
+    max_players = event.get('max_players', 2)
+    is_public = event.get('is_public', True)
+    creator_id = event.get('creator_id', 'default_creator_id')
+
+    # Create a new game using the GameService
+    game_service = GameService(game_repository, player_repository)
+    game = game_service.create_game(
+        board_size=board_size,
+        max_players=max_players,
+        is_public=is_public,
+        creator_id=creator_id
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'game_id': game.id})
+    }
+
     async def join_game(self, game_id: str, player_id: str) -> Game:
         """Join an existing game."""
         game = await self.game_repository.get_by_id(game_id)
@@ -159,4 +180,4 @@ class GameService:
         if game.is_active:
             raise GameError("Cannot delete an active game")
         
-        return await self.game_repository.delete(game_id) 
+        return await self.game_repository.delete(game_id)

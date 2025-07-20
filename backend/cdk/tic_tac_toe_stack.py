@@ -22,7 +22,7 @@ class TicTacToeStack(Stack):
         start_game_function = _lambda.Function(
             self, "StartGameFunction",
             runtime=_lambda.Runtime.PYTHON_3_8,
-            handler="start_game.lambda_handler",
+            handler="game_service.lambda_handler",
             code=_lambda.Code.from_asset("app/services"),
             environment={
                 "DYNAMODB_TABLE_NAME": game_table.table_name,
