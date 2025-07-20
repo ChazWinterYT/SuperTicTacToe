@@ -21,6 +21,17 @@ from test.constants import create_player_1, create_game_2
 # Configure pytest to use asyncio
 pytest_plugins = ["pytest_asyncio"]
 
+@pytest.fixture(autouse=True, scope="session")
+def _set_dummy_aws_env():
+    """
+    Give every test a fake AWS region/creds so boto3 never raises
+    botocore.exceptions.NoRegionError or NoCredentialsError.
+    """
+    os.environ.setdefault("AWS_REGION", "us-east-1")
+    os.environ.setdefault("AWS_DEFAULT_REGION", "us-east-1")
+    os.environ.setdefault("AWS_ACCESS_KEY_ID", "dummy")
+    os.environ.setdefault("AWS_SECRET_ACCESS_KEY", "dummy")
+
 # Mock boto3 and botocore for tests
 @pytest.fixture(autouse=True)
 def mock_aws_services():
