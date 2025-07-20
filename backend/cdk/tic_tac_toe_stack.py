@@ -27,22 +27,21 @@ class TicTacToeStack(Stack):
                 type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            table_name=f"{table_name_prefix}-games",
-            # Add GSI for querying games by player_id
-            global_secondary_indexes=[
-                dynamodb.GlobalSecondaryIndexProps(
-                    index_name="PlayerIdIndex",
-                    partition_key=dynamodb.Attribute(
-                        name="player_id",
-                        type=dynamodb.AttributeType.STRING
-                    ),
-                    sort_key=dynamodb.Attribute(
-                        name="game_id",
-                        type=dynamodb.AttributeType.STRING
-                    ),
-                    projection_type=dynamodb.ProjectionType.ALL
-                )
-            ]
+            table_name=f"{table_name_prefix}-games"
+        )
+
+        # Add GSI for querying games by player_id
+        games_table.add_global_secondary_index(
+            index_name="PlayerIdIndex",
+            partition_key=dynamodb.Attribute(
+                name="player_id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            sort_key=dynamodb.Attribute(
+                name="game_id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            projection_type=dynamodb.ProjectionType.ALL
         )
 
         # Create DynamoDB table for players

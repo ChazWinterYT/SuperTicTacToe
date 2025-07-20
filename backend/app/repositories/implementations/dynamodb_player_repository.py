@@ -28,7 +28,7 @@ class DynamoDBPlayerRepository(PlayerRepository):
     async def get_by_id(self, player_id: str) -> Optional[Player]:
         """Get a player by ID."""
         try:
-            response = self.table.get_item(Key={"id": player_id})
+            response = self.table.get_item(Key={"player_id": player_id})
             if "Item" not in response:
                 return None
             
@@ -101,7 +101,7 @@ class DynamoDBPlayerRepository(PlayerRepository):
     async def delete(self, player_id: str) -> bool:
         """Delete a player."""
         try:
-            response = self.table.delete_item(Key={"id": player_id})
+            response = self.table.delete_item(Key={"player_id": player_id})
             return "Attributes" in response
         except (ClientError, NoCredentialsError, EndpointConnectionError) as e:
             raise DatabaseError(f"Failed to delete player: {str(e)}")
