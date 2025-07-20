@@ -12,7 +12,7 @@ from app.domain.entities.player import Player
 class Game:
     """Game entity representing a tic-tac-toe game."""
     
-    id: str
+    game_id: str
     board_size: BoardSize
     max_players: int
     created_at: datetime = field(default_factory=datetime.utcnow)

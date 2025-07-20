@@ -60,7 +60,7 @@ async def create_game(
     )
     
     return GameResponse(
-        id=game.id,
+        game_id=game.id,
         board_size=str(game.board_size),
         max_players=game.max_players,
         created_at=game.created_at.isoformat(),
@@ -84,7 +84,7 @@ async def join_game(
     game = await game_service.join_game(game_id, player_id)
     
     return GameResponse(
-        id=game.id,
+        game_id=game.id,
         board_size=str(game.board_size),
         max_players=game.max_players,
         created_at=game.created_at.isoformat(),

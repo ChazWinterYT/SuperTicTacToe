@@ -8,8 +8,8 @@ from app.core.exceptions import ValidationError
 class Player:
     """Player entity representing a user in the game system."""
     
-    id: str
-    name: str
+    player_id: str
+    player_name: str
     created_at: datetime = field(default_factory=datetime.utcnow)
     last_seen: datetime = field(default_factory=datetime.utcnow)
     is_online: bool = False
@@ -19,11 +19,11 @@ class Player:
     total_score: int = 0
     
     def __post_init__(self):
-        if not self.name or not self.name.strip():
+        if not self.player_name or not self.player_name.strip():
             raise ValidationError("Player name cannot be empty")
         
-        if len(self.name.strip()) > 50:
-            raise ValidationError("Player name cannot exceed 50 characters")
+        if len(self.name.strip()) > 30:
+            raise ValidationError("Player name cannot exceed 30 characters")
     
     @property
     def win_rate(self) -> float:
@@ -38,6 +38,12 @@ class Player:
         if self.games_played == 0:
             return 0.0
         return self.total_score / self.games_played
+    
+    @property
+    def elo(self) -> float:
+        """Calculate the player's ELO rating."""
+        # Placeholder for ELO calculation logic
+        return 500.0
     
     def join_game(self, game_id: str) -> None:
         """Join a game."""

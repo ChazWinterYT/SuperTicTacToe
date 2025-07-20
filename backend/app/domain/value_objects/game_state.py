@@ -12,13 +12,14 @@ class GameStatus(Enum):
     CANCELLED = "cancelled"
 
 
+
 class PlayerSymbol(Enum):
     """Enumeration of player symbols."""
     X = "X"
     O = "O"
-    TRIANGLE = "△"
-    SQUARE = "□"
-    DIAMOND = "◇"
+    TRIANGLE = "Triangle"
+    SQUARE = "Square"
+    DIAMOND = "Diamond"
 
 
 @dataclass(frozen=True)
@@ -130,4 +131,4 @@ class GameState:
             winning_sequence=data.get("winning_sequence"),
             is_draw=data.get("is_draw", False),
             move_count=data.get("move_count", 0)
-        ) 
+        )

@@ -14,7 +14,7 @@ class TicTacToeStack(Stack):
         # Create a DynamoDB table for games
         game_table = dynamodb.Table(
             self, "GameTable",
-            partition_key={"name": "id", "type": dynamodb.AttributeType.STRING},
+            partition_key={"player_name": "player_id", "type": dynamodb.AttributeType.STRING},
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
 
