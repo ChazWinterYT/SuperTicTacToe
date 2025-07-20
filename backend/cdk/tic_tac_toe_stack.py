@@ -1,10 +1,14 @@
 from aws_cdk import (
     App,
     Stack,
+    aws_certificatemanager as acm,
+    aws_route53 as route53,
+    aws_route53_targets as targets,
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
     aws_apigatewayv2 as apigwv2,
     aws_apigatewayv2_integrations as apigwv2_integrations,
+    CfnOutput
 )
 from constructs import Construct
 
@@ -23,7 +27,22 @@ class TicTacToeStack(Stack):
                 type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            table_name=f"{table_name_prefix}-games"
+            table_name=f"{table_name_prefix}-games",
+            # Add GSI for querying games by player_id
+            global_secondary_indexes=[
+                dynamodb.GlobalSecondaryIndexProps(
+                    index_name="PlayerIdIndex",
+                    partition_key=dynamodb.Attribute(
+                        name="player_id",
+                        type=dynamodb.AttributeType.STRING
+                    ),
+                    sort_key=dynamodb.Attribute(
+                        name="game_id",
+                        type=dynamodb.AttributeType.STRING
+                    ),
+                    projection_type=dynamodb.ProjectionType.ALL
+                )
+            ]
         )
 
         # Create DynamoDB table for players
@@ -60,4 +79,10 @@ class TicTacToeStack(Stack):
                 "FastApiLambdaIntegration",
                 handler=fastapi_lambda
             )
+        )
+
+        # Output the API URL
+        CfnOutput(
+            self, "ApiUrl",
+            value=http_api.api_endpoint
         )

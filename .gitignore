@@ -1,0 +1,33 @@
+*.log
+*.pyc
+__pycache__/
+# IDEs
+.vscode/
+.idea/
+# Python virtual environments
+venv/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Build artifacts
+/build/
+/dist/
+# Miscellaneous
+.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+# Coverage reports
+.coverage
+.coverage.*
+# Pytest cache
+.pytest_cache/
+# MyPy cache
+.mypy_cache/
+# Pyre type checker
+.pyre/
+# Cython debug symbols
+.cython_debug/

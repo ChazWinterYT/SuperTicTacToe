@@ -18,6 +18,9 @@ jobs:
       with:
         node-version: '20'
 
+    - name: Inject environment variables
+      run: echo "REACT_APP_API_URL=https://x8q3os4aml.execute-api.us-east-1.amazonaws.com" >> $GITHUB_ENV
+
     - name: Install dependencies
       run: cd frontend && npm install
 

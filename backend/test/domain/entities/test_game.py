@@ -2,6 +2,23 @@ import pytest
 from app.domain.entities.game import Game
 from app.domain.entities.player import Player
 from app.domain.value_objects.board_size import BoardSize
+
+def test_player_ids_property_and_to_dict():
+    player1 = Player(player_id="p1", player_name="Player One")
+    player2 = Player(player_id="p2", player_name="Player Two")
+    game = Game(
+        game_id="game1",
+        board_size=BoardSize(3, 3),
+        max_players=2,
+        players=[player1, player2]
+    )
+    # Test player_ids property
+    assert game.player_ids == ["p1", "p2"]
+
+    # Test to_dict includes player_ids
+    game_dict = game.to_dict()
+    assert "player_ids" in game_dict
+    assert game_dict["player_ids"] == ["p1", "p2"]
 from app.domain.value_objects.game_state import GameStatus, PlayerSymbol
 from app.core.exceptions import ValidationError, GameError
 from test.constants import create_player_1, create_player_2, create_player_3, create_game_1, create_game_2, CREATOR_ID

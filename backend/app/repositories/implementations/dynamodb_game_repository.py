@@ -55,8 +55,9 @@ class DynamoDBGameRepository(GameRepository):
     async def get_games_by_player(self, player_id: str) -> List[Game]:
         """Get all games for a specific player."""
         try:
-            response = self.table.scan(
-                FilterExpression="contains(players, :player_id)",
+            response = self.table.query(
+                IndexName="PlayerIdIndex",
+                KeyConditionExpression="player_id = :player_id",
                 ExpressionAttributeValues={":player_id": player_id}
             )
             
@@ -212,4 +213,4 @@ class DynamoDBGameRepository(GameRepository):
             from app.domain.value_objects.game_state import GameState
             game.game_state = GameState.from_dict(data["game_state"])
         
-        return game 
+        return game

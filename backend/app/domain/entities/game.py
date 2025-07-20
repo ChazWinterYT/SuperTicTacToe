@@ -242,6 +242,11 @@ class Game:
                 won = player.player_id == winner.player_id
                 player.record_game_result(won, player_score.score)
     
+    @property
+    def player_ids(self) -> List[str]:
+        """Return list of player IDs."""
+        return [player.player_id for player in self.players]
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert game to dictionary for serialization."""
         return {
@@ -252,6 +257,7 @@ class Game:
             "started_at": self.started_at.isoformat() if self.started_at else None,
             "finished_at": self.finished_at.isoformat() if self.finished_at else None,
             "players": [p.to_dict() for p in self.players],
+            "player_ids": self.player_ids,
             "game_state": self.game_state.to_dict() if self.game_state else None,
             "status": self.status.value,
             "is_public": self.is_public,
