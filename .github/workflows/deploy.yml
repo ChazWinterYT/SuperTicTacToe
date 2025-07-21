@@ -20,8 +20,8 @@ jobs:
 
     - name: Inject environment variables
       run: |
-        echo "REACT_APP_API_URL=https://x8q3os4aml.execute-api.us-east-1.amazonaws.com" >> $GITHUB_ENV
-        echo "REACT_APP_WEBSOCKET_URL=wss://yqsjlqaiyg.execute-api.us-east-1.amazonaws.com/prod/" >> $GITHUB_ENV
+        echo "REACT_APP_API_URL=https://hodutddca9.execute-api.us-east-1.amazonaws.com" >> $GITHUB_ENV
+        echo "REACT_APP_WEBSOCKET_URL=wss://7t451nzebb.execute-api.us-east-1.amazonaws.com/prod" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: cd frontend && npm install
