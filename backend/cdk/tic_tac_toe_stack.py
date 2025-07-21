@@ -69,6 +69,11 @@ class TicTacToeStack(Stack):
 
         http_api = apigwv2.HttpApi(
             self, "HttpApi",
+            cors_preflight=apigwv2.CorsPreflightOptions(
+                allow_origins=["https://chazwinter.com"],
+                allow_methods=[apigwv2.CorsHttpMethod.ANY],
+                allow_headers=["content-type", "authorization"],
+            ),
             default_integration=apigwv2_integrations.HttpLambdaIntegration(
                 "FastApiIntegration", fastapi_lambda
             ),
