@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/JoinLobby.css';
 
-const BASE_URL = process.env.REACT_APP_TIC_TAC_TOE_API_BASE_URL;
-
+const BASE_URL = process.env.REACT_APP_API_URL;
 interface JoinLobbyProps {
     onJoin: (playerId: string) => void;
 }
