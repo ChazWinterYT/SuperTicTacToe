@@ -80,7 +80,7 @@ class TicTacToeStack(Stack):
             fn = _lambda.Function(
                 self, id_,
                 runtime=_lambda.Runtime.PYTHON_3_11,
-                handler=f"websocket_handlers.{handler}",
+                handler=f"api.v1.websocket_handlers.{handler}",
                 code=_lambda.Code.from_asset("app"),
                 environment={
                     "CONNECTIONS_TABLE_NAME": connections_table.table_name,
@@ -101,7 +101,9 @@ class TicTacToeStack(Stack):
             disconnect_route_options=apigwv2.WebSocketRouteOptions(
                 integration=apigwv2_integrations.WebSocketLambdaIntegration(
                     "DisconnectIntegration", disconnect_fn)),
+            route_selection_expression="$request.body.action",
         )
+
         websocket_api.add_route(
             "sendMessage",
             integration=apigwv2_integrations.WebSocketLambdaIntegration(
