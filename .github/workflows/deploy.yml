@@ -46,3 +46,7 @@ jobs:
 
     - name: Sync build/ to S3
       run: aws s3 sync frontend/build/ s3://chazwinter.com/SuperTicTacToe/frontend --delete
+
+    - name: Invalidate CloudFront cache for index.html
+      run: |
+        aws cloudfront create-invalidation --distribution-id E15GZRLX9201VO --paths /index.html
