@@ -21,9 +21,22 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    from fastapi.responses import JSONResponse
+
     @app.exception_handler(SuperTicTacToeException)
     async def _handle(request, exc: SuperTicTacToeException):
-        raise handle_super_tictactoe_exception(exc)
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "error_code": exc.error_code,
+                "message": exc.message,
+                "details": exc.details,
+            },
+            headers={
+                "Access-Control-Allow-Origin": "https://chazwinter.com",
+                "Access-Control-Allow-Credentials": "true",
+            },
+        )
 
     app.include_router(lobby.router,
                        prefix=f"{settings.api_v1_prefix}/lobby",
