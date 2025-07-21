@@ -1,42 +1,34 @@
-import React, { useState } from 'react';
-import './App.css';
-import TicTacToeBoard3x3 from './components/TicTacToeBoard3x3';
-import Version from './components/Version';
-import JoinLobby from './components/JoinLobby';
-import Lobby from './components/Lobby';
+import React from "react";
+import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { PlayerProvider } from "./contexts/PlayerContext";
+import JoinPage from "./pages/JoinPage";
+import LobbyPage from "./pages/LobbyPage";
+import GamePage from "./pages/GamePage";
+import NotFoundPage from "./pages/NotFoundPage";
+import Version from "./components/Version";
 
 function App() {
-  const [playerId, setPlayerId] = useState<string | null>(null);
-  const [gameId, setGameId] = useState<string | null>(null);
-
-  // Handle when a player joins the lobby
-  const handleJoinLobby = (id: string) => {
-    setPlayerId(id);
-  };
-
-  // Handle when a player challenges another player
-  const handleChallenge = (challengedPlayerId: string) => {
-    // Generate or retrieve a game ID
-    const newGameId = `game_${Date.now()}`;
-    setGameId(newGameId);
-  };
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <h2>Super Tic Tac Toe!</h2>
-      </header>
-      <div className='main-content'>
-        {gameId && playerId ? (
-          <TicTacToeBoard3x3 gameId={gameId} player={playerId} />
-        ) : playerId ? (
-          <Lobby playerId={playerId} onChallenge={handleChallenge} />
-        ) : (
-          <JoinLobby onJoin={handleJoinLobby} />
-        )}
+    <PlayerProvider>
+      <div className="App">
+        <header className="App-header">
+          <h2>Super Tic Tac Toe!</h2>
+        </header>
+        <div className="main-content">
+          <BrowserRouter basename="/SuperTicTacToe/frontend">
+            <Routes>
+              <Route path="/" element={<JoinPage />} />
+              <Route path="/join" element={<Navigate to="/" replace />} />
+              <Route path="/lobby" element={<LobbyPage />} />
+              <Route path="/game/:gameId" element={<GamePage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+        <Version />
       </div>
-      <Version />
-    </div>
+    </PlayerProvider>
   );
 }
 
