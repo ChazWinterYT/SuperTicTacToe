@@ -10,4 +10,14 @@ export async function leaveLobby(playerId: string) {
   return response.data;
 }
 
+export async function getLobbyPlayers() {
+  const response = await apiClient.get('/lobby/players');
+  return (response.data as any).players;
+}
+
+export async function challengePlayer(challengerId: string, challengedId: string) {
+  const response = await apiClient.post(`/lobby/challenge/${challengerId}`, { challenged_player_id: challengedId });
+  return response.data;
+}
+
 // Add other lobby-related API functions as needed
