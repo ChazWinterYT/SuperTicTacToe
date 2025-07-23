@@ -5,23 +5,23 @@ export async function createGame(creatorId: string, payload: any) {
   return response.data;
 }
 
-export async function joinGame(id: string, player: string) {
-  const response = await apiClient.post(`/games/${id}/join/${player}`);
+export async function joinGame(gameId: string, playerId: string) {
+  const response = await apiClient.post(`/games/${gameId}/join/${playerId}`);
   return response.data;
 }
 
-export async function startGame(id: string, player: string) {
-  const response = await apiClient.post(`/games/${id}/start/${player}`);
+export async function startGame(gameId: string, playerId: string) {
+  const response = await apiClient.post(`/games/${gameId}/start/${playerId}`);
   return response.data;
 }
 
-export async function makeMove(id: string, player: string, pos: any) {
-  const response = await apiClient.post(`/games/${id}/move/${player}`, pos);
+export async function makeMove(gameId: string, playerId: string, position: number) {
+  const response = await apiClient.post(`/games/${gameId}/move/${playerId}`, { position });
   return response.data;
 }
 
-export async function getGame(id: string) {
-  const response = await apiClient.get(`/games/${id}`);
+export async function getGame(gameId: string) {
+  const response = await apiClient.get(`/games/${gameId}`);
   return response.data;
 }
 
@@ -30,7 +30,7 @@ export async function getPublicGames() {
   return response.data;
 }
 
-export async function deleteGame(id: string, player: string) {
-  const response = await apiClient.delete(`/games/${id}/${player}`);
+export async function deleteGame(gameId: string, playerId: string) {
+  const response = await apiClient.delete(`/games/${gameId}/${playerId}`);
   return response.data;
 }
