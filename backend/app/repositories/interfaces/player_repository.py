@@ -49,4 +49,4 @@ class PlayerRepository(ABC):
     @abstractmethod
     async def update_last_seen(self, player_id: str) -> bool:
         """Update a player's last seen timestamp."""
-        pass 
+        pass

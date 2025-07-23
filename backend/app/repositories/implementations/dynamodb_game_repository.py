@@ -5,7 +5,9 @@ from botocore.exceptions import ClientError, NoCredentialsError, EndpointConnect
 from app.core.config import settings
 from app.core.exceptions import NotFoundError, DatabaseError
 from app.domain.entities.game import Game
+from app.domain.entities.player import Player
 from app.domain.value_objects.board_size import BoardSize
+from app.domain.value_objects.game_state import GameState
 from app.repositories.interfaces.game_repository import GameRepository
 from app.repositories.interfaces.player_repository import PlayerRepository
 
@@ -191,11 +193,7 @@ class DynamoDBGameRepository(GameRepository):
             raise DatabaseError(f"Unexpected error ending game: {str(e)}")
 
     def _dict_to_game(self, data: dict) -> Game:
-        """Convert dictionary to Game entity."""
-        # This is a simplified conversion - in a real implementation,
-        # you'd need to properly reconstruct all the nested objects
-        from app.domain.entities.player import Player
-
+        """Convert dictionary to Game entity."""      
         # Parse board size
         board_size_str = data.get("board_size", "3x3")
         width, height = map(int, board_size_str.split("x"))
@@ -223,7 +221,6 @@ class DynamoDBGameRepository(GameRepository):
 
         # Parse game state (simplified)
         if "game_state" in data and data["game_state"]:
-            from app.domain.value_objects.game_state import GameState
             game.game_state = GameState.from_dict(data["game_state"])
 
         return game

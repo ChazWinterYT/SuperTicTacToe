@@ -2,6 +2,7 @@ from typing import List, Optional, Dict, Any
 from dataclasses import dataclass, field
 from datetime import datetime
 import uuid
+from app.core.config import settings
 from app.core.exceptions import GameError, ValidationError
 from app.domain.value_objects.board_size import BoardSize
 from app.domain.value_objects.game_state import GameState, GameStatus, PlayerSymbol, PlayerScore
@@ -181,7 +182,6 @@ class Game:
     
     def _calculate_points(self, sequences: List[List[int]]) -> int:
         """Calculate points for winning sequences."""
-        from app.core.config import settings
         
         total_points = 0
         for sequence in sequences:
@@ -217,7 +217,6 @@ class Game:
             return True
         
         # Check if any player has a significant lead (e.g., 3x the base score)
-        from app.core.config import settings
         max_score = max(p.score for p in self.game_state.players)
         min_score = min(p.score for p in self.game_state.players)
         

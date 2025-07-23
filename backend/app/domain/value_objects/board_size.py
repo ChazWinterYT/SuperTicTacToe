@@ -80,4 +80,4 @@ class BoardSize:
         return f"{self.width}x{self.height}"
     
     def __repr__(self) -> str:
-        return f"BoardSize({self.width}, {self.height})" 
+        return f"BoardSize({self.width}, {self.height})"

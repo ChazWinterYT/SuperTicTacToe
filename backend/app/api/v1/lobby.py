@@ -163,4 +163,4 @@ async def get_player(
         win_rate=player.win_rate,
         average_score=player.average_score,
         elo=player.elo
-    ) 
+    )

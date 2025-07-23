@@ -19,7 +19,13 @@ const JoinLobby: React.FC<JoinLobbyProps> = ({ onJoin }) => {
         if (playerName.trim()) {
             try {
                 const response = await axios.post<JoinLobbyResponse>(
-                    `${BASE_URL}/lobby/join?player_name=${playerName.trim()}`,
+                    `${BASE_URL}/api/v1/lobby/join`,
+                    { player_name: playerName.trim() },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
                 );
                 const playerId = response.data.player_id;
                 onJoin(playerId);

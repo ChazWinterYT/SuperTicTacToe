@@ -65,4 +65,4 @@ class GameRepository(ABC):
     @abstractmethod
     async def end_game(self, game_id: str) -> bool:
         """End a game."""
-        pass 
+        pass

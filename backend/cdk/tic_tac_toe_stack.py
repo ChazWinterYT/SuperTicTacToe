@@ -1,5 +1,7 @@
 from aws_cdk import (
     App, Stack,
+    BundlingOptions,
+    Duration,
     RemovalPolicy,
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
@@ -53,16 +55,61 @@ class TicTacToeStack(Stack):
             removal_policy=RemovalPolicy.RETAIN,
         )
 
+        # ─────────── Bundle assets into Lambdas ──────────────
+        deps_layer = _lambda.LayerVersion(
+            self, "DepsLayer",
+            code=_lambda.Code.from_asset(
+                "lambda_layer",
+                bundling=BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_11.bundling_image,
+                    command=[
+                        "bash", "-c",
+                        "pip install -r requirements.txt --no-cache-dir -t /asset-output/python"
+                    ],
+                ),
+            ),
+            compatible_runtimes=[_lambda.Runtime.PYTHON_3_11],
+            description="Shared dependencies for FastAPI and WebSocket Lambdas",
+        )
+
+        rsync_command = [
+            "bash", "-c",
+            (
+                "rsync -av "
+                "--exclude='__pycache__/' "
+                "--exclude='.pytest_cache/' "
+                "--exclude='*.pyc' "
+                "--exclude='.mypy_cache/' "
+                "--exclude='.DS_Store' "
+                "app/ /asset-output/app"
+            )
+        ]
+        
+        app_code = _lambda.Code.from_asset(
+            ".",
+            exclude=[
+                "*",
+                "!app/**",
+            ],
+            bundling=BundlingOptions(
+                image=_lambda.Runtime.PYTHON_3_11.bundling_image,
+                command=rsync_command,
+            ),
+        )
+
         # ─────────────────── REST  (HttpApi) ───────────────────
         fastapi_lambda = _lambda.Function(
             self, "FastApi",
             runtime=_lambda.Runtime.PYTHON_3_11,
-            handler="main.lambda_handler",
-            code=_lambda.Code.from_asset("app"),
+            handler="app.main.lambda_handler",
+            code=app_code,
+            layers=[deps_layer],
             environment={
                 "DYNAMODB_GAMES_TABLE_NAME": games_table.table_name,
                 "DYNAMODB_PLAYERS_TABLE_NAME": players_table.table_name,
             },
+            memory_size=512,
+            timeout=Duration.seconds(30),
         )
         games_table.grant_read_write_data(fastapi_lambda)
         players_table.grant_read_write_data(fastapi_lambda)
@@ -86,10 +133,13 @@ class TicTacToeStack(Stack):
                 self, id_,
                 runtime=_lambda.Runtime.PYTHON_3_11,
                 handler=f"api.v1.websocket_handlers.{handler}",
-                code=_lambda.Code.from_asset("app"),
+                code=app_code,
+                layers=[deps_layer],
                 environment={
                     "CONNECTIONS_TABLE_NAME": connections_table.table_name,
                 },
+                memory_size=512,
+                timeout=Duration.seconds(30),
             )
             connections_table.grant_read_write_data(fn)
             return fn

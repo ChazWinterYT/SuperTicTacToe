@@ -1,15 +1,6 @@
 import sys
 import os
 from pathlib import Path
-
-# Add the backend directory to Python path
-backend_dir = Path(__file__).parent
-sys.path.insert(0, str(backend_dir))
-
-# Set environment variables for testing
-os.environ["TESTING"] = "true"
-
-# Mock AWS services for testing
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
 from typing import List, Optional
@@ -17,6 +8,13 @@ from app.domain.entities.player import Player
 from app.domain.entities.game import Game
 from app.domain.value_objects.board_size import BoardSize
 from test.constants import create_player_1, create_game_2
+
+# Add the backend directory to Python path
+backend_dir = Path(__file__).parent
+sys.path.insert(0, str(backend_dir))
+
+# Set environment variables for testing
+os.environ["TESTING"] = "true"
 
 # Configure pytest to use asyncio
 pytest_plugins = ["pytest_asyncio"]

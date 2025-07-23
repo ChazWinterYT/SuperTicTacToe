@@ -4,7 +4,7 @@ from mangum import Mangum
 
 from app.core.config import settings
 from app.core.exceptions import SuperTicTacToeException, handle_super_tictactoe_exception
-from app.api.v1 import lobby, games     # ← WebSocket router removed
+from app.api.v1 import lobby, games
 
 def create_app() -> FastAPI:
     app = FastAPI(
