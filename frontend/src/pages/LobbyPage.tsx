@@ -4,25 +4,25 @@ import Lobby from "../components/Lobby";
 import { usePlayer } from "../contexts/PlayerContext";
 
 const LobbyPage: React.FC = () => {
-  const { playerId } = usePlayer();
+  const { player } = usePlayer();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!playerId) {
+    if (!player?.playerId) {
       navigate("/", { replace: true });
     }
-  }, [playerId, navigate]);
+  }, [player, navigate]);
 
   // Placeholder for onChallenge, can be expanded later
   const handleChallenge = (challengedPlayerId: string) => {
     // This will be handled in a later milestone
   };
 
-  if (!playerId) return null;
+  if (!player?.playerId) return null;
 
   return (
     <div>
-      <Lobby playerId={playerId} onChallenge={handleChallenge} />
+      <Lobby playerId={player.playerId} onChallenge={handleChallenge} />
     </div>
   );
 };

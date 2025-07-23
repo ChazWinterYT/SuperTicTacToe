@@ -4,21 +4,21 @@ import TicTacToeBoard3x3 from "../components/TicTacToeBoard3x3";
 import { usePlayer } from "../contexts/PlayerContext";
 
 const GamePage: React.FC = () => {
-  const { playerId } = usePlayer();
+  const { player } = usePlayer();
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!playerId) {
+    if (!player?.playerId) {
       navigate("/", { replace: true });
     }
-  }, [playerId, navigate]);
+  }, [player, navigate]);
 
-  if (!playerId || !gameId) return null;
+  if (!player?.playerId || !gameId) return null;
 
   return (
     <div>
-      <TicTacToeBoard3x3 gameId={gameId} player={playerId} />
+      <TicTacToeBoard3x3 gameId={gameId} player={player.playerId} />
     </div>
   );
 };

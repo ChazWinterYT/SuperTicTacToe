@@ -1,40 +1,58 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { randomName } from '../utils/randomName';
 
-interface PlayerContextType {
-  playerId: string | null;
-  setPlayerId: (id: string | null) => void;
+interface Player {
+  playerId: string;
+  displayName: string;
+  isGuest: boolean;
 }
 
-const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
+interface PlayerContextType {
+  player: Player | null;
+  setPlayer: React.Dispatch<React.SetStateAction<Player | null>>;
+}
 
-export const PlayerProvider = ({ children }: { children: ReactNode }) => {
-  const [playerId, setPlayerIdState] = useState<string | null>(() => {
-    return localStorage.getItem("playerId");
-  });
+export const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
+
+export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [player, setPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
-    if (playerId) {
-      localStorage.setItem("playerId", playerId);
+    // Load player from localStorage or create guest
+    const storedPlayer = localStorage.getItem('player');
+    if (storedPlayer) {
+      setPlayer(JSON.parse(storedPlayer));
     } else {
-      localStorage.removeItem("playerId");
+      const guestPlayer: Player = {
+        playerId: crypto.randomUUID(),
+        displayName: randomName(),
+        isGuest: true,
+      };
+      setPlayer(guestPlayer);
+      localStorage.setItem('player', JSON.stringify(guestPlayer));
     }
-  }, [playerId]);
+  }, []);
 
-  const setPlayerId = (id: string | null) => {
-    setPlayerIdState(id);
-  };
+  useEffect(() => {
+    if (player) {
+      localStorage.setItem('player', JSON.stringify(player));
+    }
+  }, [player]);
 
   return (
-    <PlayerContext.Provider value={{ playerId, setPlayerId }}>
+    <PlayerContext.Provider value={{ player, setPlayer }}>
       {children}
     </PlayerContext.Provider>
   );
 };
 
-export const usePlayer = (): PlayerContextType => {
+// Add usePlayer hook for convenience
+import { useContext } from 'react';
+
+export function usePlayer() {
   const context = useContext(PlayerContext);
   if (!context) {
-    throw new Error("usePlayer must be used within a PlayerProvider");
+    throw new Error('usePlayer must be used within a PlayerProvider');
   }
   return context;
-};
+}
